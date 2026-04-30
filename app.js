@@ -1164,9 +1164,32 @@ function VentasModule({cal}){
       React.createElement("div",{className:"stat-card",style:{padding:"12px"}},React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:1,textTransform:"uppercase",marginBottom:4}},"Ticket promedio"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:700,color:"#c9a84c"}},fmt(ticketProm)))
     ),
     calTotal>0&&React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",marginBottom:14}},
-      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:12}},"Ingresos por semana"),
-      React.createElement("div",{style:{display:"flex",gap:6,alignItems:"flex-end",height:80}},
-        weeks.map((w,i)=>{const pct=Math.max((w/maxWeek)*100,4);return React.createElement("div",{key:i,style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}},w>0&&React.createElement("div",{style:{fontSize:9,color:"#c9a84c",fontWeight:700}},w>=1000?(w/1000).toFixed(1)+"k":w),React.createElement("div",{style:{width:"100%",height:`${pct}%`,background:w>0?"linear-gradient(180deg,#e0bb6e,#c9a84c)":"#222",borderRadius:"4px 4px 0 0",minHeight:4}}),React.createElement("div",{style:{fontSize:8,color:"#909090"}},`S${i+1}`));})
+      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:14}},"Ingresos por semana"),
+      React.createElement("div",{style:{display:"flex",gap:8,alignItems:"flex-end",height:100}},
+        weeks.map((w,i)=>{
+          const pct=maxWeek>0?Math.max((w/maxWeek)*100,w>0?8:2):2;
+          const isMax=w===maxWeek&&w>0;
+          return React.createElement("div",{key:i,style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:5}},
+            w>0&&React.createElement("div",{style:{fontSize:10,color:isMax?"#e0bb6e":"#c9a84c",fontWeight:700,textAlign:"center"}},
+              w>=1000?(w/1000).toFixed(1)+"k":"$"+w
+            ),
+            React.createElement("div",{style:{
+              width:"100%",
+              height:`${pct}%`,
+              background:isMax?"linear-gradient(180deg,#ffe08a,#c9a84c)":w>0?"linear-gradient(180deg,#c9a84c,#8a6f2e)":"#1e1e1e",
+              borderRadius:"6px 6px 0 0",
+              minHeight:w>0?8:2,
+              border:isMax?"1px solid rgba(224,187,110,.4)":"none",
+              boxShadow:isMax?"0 0 12px rgba(201,168,76,.3)":"none",
+              transition:"height .3s"
+            }}),
+            React.createElement("div",{style:{fontSize:8,color:isMax?"#c9a84c":"#909090",fontWeight:isMax?700:400}},`S${i+1}`)
+          );
+        })
+      ),
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginTop:8,paddingTop:8,borderTop:"1px solid #2a2a2a"}},
+        React.createElement("span",{style:{fontSize:10,color:"#909090"}},"Mejor semana: S"+(weeks.indexOf(maxWeek)+1)),
+        React.createElement("span",{style:{fontSize:10,color:"#c9a84c",fontWeight:700}},fmt(maxWeek))
       )
     ),
     // Origins breakdown
@@ -1203,7 +1226,18 @@ function VentasModule({cal}){
     calServices.length===0&&React.createElement("div",{style:{textAlign:"center",padding:"40px 0",color:"#909090"}},React.createElement("div",{style:{fontSize:32,marginBottom:12}},"📊"),React.createElement("div",{style:{fontSize:14}},"Sin datos este mes")),
     calServices.length>0&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:16}},
       React.createElement("button",{onClick:()=>setShowReport(true),style:{padding:"13px",background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,color:"#d0d0d0",fontFamily:"'Barlow',sans-serif",fontSize:13,fontWeight:600,cursor:"pointer"}},"📊 Ver reporte"),
-      React.createElement("button",{onClick:generatePDF,style:{padding:"13px",background:"#1c1c1c",border:"1px solid #c9a84c",borderRadius:10,color:"#c9a84c",fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,letterSpacing:1,textTransform:"uppercase",cursor:"pointer"}},"📄 PDF")
+      React.createElement("button",{onClick:()=>{
+        // Build PDF HTML
+        const rows=calServices.map(s=>{const orig=ORIGINS.find(o=>o.id===s.origin);return `<tr><td>${s.day}</td><td>${s.serviceNorm||s.service||"—"}</td><td>${s.vehicle||"—"}</td><td>${s.client||"—"}</td><td>${orig?orig.label:"—"}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${s.price?fmt(parseFloat(s.price)):"—"}</td></tr>`;}).join("");
+        const originRows=ORIGINS.map(o=>{const svcs=calServices.filter(s=>s.origin===o.id);if(!svcs.length)return"";const total=svcs.reduce((a,s)=>a+(parseFloat(s.price)||0),0);return`<tr><td>${o.emoji} ${o.label}</td><td style="text-align:center">${svcs.length}</td><td style="font-size:10px">${[...new Set(svcs.map(s=>s.serviceNorm||s.service))].slice(0,3).join(", ")}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(total)}</td></tr>`;}).filter(Boolean).join("");
+        const noOrigin=calServices.filter(s=>!s.origin);
+        const noRow=noOrigin.length?`<tr><td>— Sin origen</td><td style="text-align:center">${noOrigin.length}</td><td style="font-size:10px">${[...new Set(noOrigin.map(s=>s.serviceNorm||s.service))].slice(0,3).join(", ")}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(noOrigin.reduce((a,s)=>a+(parseFloat(s.price)||0),0))}</td></tr>`:"";
+        const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reporte ${MONTHS[month-1]} ${year}</title><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:12mm;size:Letter}body{font-family:'Barlow',sans-serif;background:#1a1a1a;color:#d0d0d0;padding:20px 22px}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #333}.brand{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;letter-spacing:7px;color:#fff;line-height:1}.brand span{color:#c9a84c}.brand-sub{font-size:8px;letter-spacing:4px;color:#666;text-transform:uppercase;margin-top:3px}.badge{background:#c9a84c;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;padding:4px 12px;display:inline-block;margin-bottom:6px}.meta{font-size:10px;color:#888;text-align:right;line-height:1.9}.meta span{color:#d0d0d0}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}.kpi{background:#222;border:1px solid #333;border-radius:7px;padding:9px 7px;text-align:center}.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;color:#c9a84c;line-height:1}.kpi-lbl{font-size:7px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:3px}.sec{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin:12px 0 6px;padding-bottom:5px;border-bottom:1px solid #333}table{width:100%;border-collapse:collapse;font-size:10px}th{background:#222;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;font-size:7.5px;padding:6px 8px;text-align:left;border-bottom:1px solid #333}td{padding:6px 8px;border-bottom:1px solid #252525;color:#d0d0d0;vertical-align:middle}tr:nth-child(even) td{background:#1e1e1e}.total-row td{background:#252525;font-weight:700;color:#fff;border-top:2px solid #c9a84c;font-size:11px}.footer{margin-top:14px;display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #333}.footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;color:#fff}.footer-brand span{color:#c9a84c}.footer-note{font-style:italic;font-size:9px;color:#666}@media print{.no-print{display:none!important}}</style></head><body><div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#111;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:999;border-bottom:1px solid #333"><span style="color:#c9a84c;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px">ALPHA DETAILING</span><div style="display:flex;gap:8px"><button onclick="window.print()" style="background:#c9a84c;border:none;border-radius:6px;color:#000;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer">🖨 Imprimir</button><button onclick="history.back()" style="background:#333;border:none;border-radius:6px;color:#fff;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer">← Volver</button></div></div><div style="margin-top:44px"><div class="header"><div><div class="brand">ALPHA <span>DETAILING</span></div><div class="brand-sub">Reporte de ventas</div></div><div><div class="badge">${MONTHS[month-1].toUpperCase()} ${year}</div><div class="meta">Generado <span>${new Date().toLocaleDateString("es-MX")}</span></div></div></div><div class="kpis"><div class="kpi"><div class="kpi-val">${fmt(calTotal)}</div><div class="kpi-lbl">Total del mes</div></div><div class="kpi"><div class="kpi-val">${calServices.length}</div><div class="kpi-lbl">Servicios</div></div><div class="kpi"><div class="kpi-val">${fmt(ticketProm)}</div><div class="kpi-lbl">Ticket promedio</div></div><div class="kpi"><div class="kpi-val">${calServices.filter(s=>s.status==="paid").length}</div><div class="kpi-lbl">Cobrados</div></div></div><div class="sec">Origen de clientes</div><table><thead><tr><th>Origen</th><th>Cant.</th><th>Servicios</th><th style="text-align:right">Total</th></tr></thead><tbody>${originRows}${noRow}<tr class="total-row"><td colspan="3">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table><div class="sec">Detalle de servicios</div><table><thead><tr><th>Día</th><th>Servicio</th><th>Vehículo</th><th>Cliente</th><th>Origen</th><th style="text-align:right">Monto</th></tr></thead><tbody>${rows}<tr class="total-row"><td colspan="5">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table><div class="footer"><div class="footer-brand">ALPHA <span>DETAILING</span></div><div class="footer-note">Reporte interno confidencial</div></div></div></body></html>`;
+        // Use data URI to avoid popup blocker + allow back navigation
+        const blob=new Blob([html],{type:"text/html"});
+        const url=URL.createObjectURL(blob);
+        window.location.href=url;
+      },style:{padding:"13px",background:"#1c1c1c",border:"1px solid #c9a84c",borderRadius:10,color:"#c9a84c",fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,letterSpacing:1,textTransform:"uppercase",cursor:"pointer"}},"📄 PDF")
     ),
     // Full report overlay with back button
     showReport&&React.createElement("div",{style:{position:"fixed",inset:0,background:"#0e0e0e",zIndex:400,overflowY:"auto"}},
