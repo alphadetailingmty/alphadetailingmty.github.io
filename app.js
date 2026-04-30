@@ -1032,65 +1032,88 @@ function VentasModule({cal}){
     const win=window.open("","_blank");
     const rows=calServices.map(s=>{
       const orig=ORIGINS.find(o=>o.id===s.origin);
-      return `<tr><td>${s.day}</td><td>${s.serviceNorm||s.service||"—"}</td><td>${s.vehicle||"—"}</td><td>${s.client||"—"}</td><td>${orig?orig.emoji+" "+orig.label:"—"}</td><td style="text-align:right;font-weight:700;color:#b8860b">${s.price?fmt(parseFloat(s.price)):"—"}</td></tr>`;
+      return `<tr><td>${s.day}</td><td>${s.serviceNorm||s.service||"—"}</td><td>${s.vehicle||"—"}</td><td>${s.client||"—"}</td><td>${orig?orig.label:"—"}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${s.price?fmt(parseFloat(s.price)):"—"}</td></tr>`;
     }).join("");
-    // Origin breakdown
     const originRows=ORIGINS.map(o=>{
       const svcs=calServices.filter(s=>s.origin===o.id);
       if(!svcs.length) return "";
       const total=svcs.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
-      const svcNames=[...new Set(svcs.map(s=>s.serviceNorm||s.service))].join(", ");
-      return `<tr><td>${o.emoji} ${o.label}</td><td>${svcs.length}</td><td>${svcNames}</td><td style="text-align:right;font-weight:700;color:#b8860b">${fmt(total)}</td></tr>`;
+      const svcNames=[...new Set(svcs.map(s=>s.serviceNorm||s.service))].slice(0,3).join(", ");
+      return `<tr><td>${o.emoji} ${o.label}</td><td style="text-align:center">${svcs.length}</td><td style="font-size:10px">${svcNames}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(total)}</td></tr>`;
     }).filter(Boolean).join("");
     const noOrigin=calServices.filter(s=>!s.origin);
-    const noOriginRow=noOrigin.length?`<tr><td>— Sin origen</td><td>${noOrigin.length}</td><td>${[...new Set(noOrigin.map(s=>s.serviceNorm||s.service))].join(", ")}</td><td style="text-align:right">${fmt(noOrigin.reduce((a,s)=>a+(parseFloat(s.price)||0),0))}</td></tr>`:"";
+    const noOriginRow=noOrigin.length?`<tr><td>— Sin origen</td><td style="text-align:center">${noOrigin.length}</td><td style="font-size:10px">${[...new Set(noOrigin.map(s=>s.serviceNorm||s.service))].slice(0,3).join(", ")}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(noOrigin.reduce((a,s)=>a+(parseFloat(s.price)||0),0))}</td></tr>`:"";
 
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte ${MONTHS[month-1]} ${year} — Alpha Detailing</title>
-    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Reporte ${MONTHS[month-1]} ${year} — Alpha Detailing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
     <style>
       *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-      @page{margin:10mm;size:Letter}
-      body{font-family:'Barlow','Helvetica Neue',sans-serif;background:#fff;color:#111;zoom:0.82}
-      .header{background:#111;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:0}
-      .brand{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;letter-spacing:6px;color:#fff}
+      @page{margin:0;size:Letter}
+      html,body{width:100%;height:100%;background:#1a1a1a}
+      body{font-family:'Barlow','Helvetica Neue',sans-serif;color:#d0d0d0;padding:20px 24px}
+      .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #333}
+      .brand{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:800;letter-spacing:8px;color:#fff;line-height:1}
       .brand span{color:#c9a84c}
-      .badge{background:#c9a84c;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:5px 14px;display:inline-block;margin-bottom:6px}
-      .meta{font-size:11px;color:#ccc;text-align:right;line-height:1.8}
-      .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
-      .kpi{border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 8px;text-align:center}
-      .kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#c9a84c}
-      .kpi-lbl{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
-      .section-title{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin:12px 0 6px;padding-bottom:5px;border-bottom:1.5px solid #e5e7eb}
+      .brand-sub{font-size:9px;letter-spacing:5px;color:#666;text-transform:uppercase;margin-top:4px}
+      .badge{background:#c9a84c;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;padding:5px 14px;display:inline-block;margin-bottom:8px}
+      .meta{font-size:11px;color:#888;text-align:right;line-height:1.9}
+      .meta span{color:#d0d0d0}
+      .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+      .kpi{background:#222;border:1px solid #333;border-radius:8px;padding:10px 8px;text-align:center}
+      .kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700;color:#c9a84c;line-height:1}
+      .kpi-lbl{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+      .sec{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin:14px 0 7px;padding-bottom:6px;border-bottom:1px solid #333}
       table{width:100%;border-collapse:collapse;font-size:11px}
-      th{background:#f9fafb;color:#888;text-transform:uppercase;letter-spacing:.5px;font-size:8px;padding:7px 8px;text-align:left;border-bottom:1px solid #e5e7eb}
-      td{padding:7px 8px;border-bottom:1px solid #f3f4f6;color:#333}
-      tr:nth-child(even) td{background:#fafafa}
-      .total-row td{background:#f9fafb;font-weight:700;color:#111;border-top:2px solid #c9a84c}
-      .footer{margin-top:16px;display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #e5e7eb}
-      .footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:4px;color:#111}
+      th{background:#222;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;font-size:8px;padding:7px 10px;text-align:left;border-bottom:1px solid #333}
+      td{padding:7px 10px;border-bottom:1px solid #252525;color:#d0d0d0;vertical-align:middle}
+      tr:nth-child(even) td{background:#1e1e1e}
+      .total-row td{background:#252525;font-weight:700;color:#fff;border-top:2px solid #c9a84c;font-size:12px}
+      .footer{margin-top:16px;display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #333}
+      .footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:4px;color:#fff}
       .footer-brand span{color:#c9a84c}
-      .footer-note{font-size:9px;color:#aaa;font-style:italic}
+      .footer-note{font-style:italic;font-size:10px;color:#666}
     </style></head><body>
     <div class="header">
-      <div><div class="brand">ALPHA <span>DETAILING</span></div><div style="font-size:9px;letter-spacing:3px;color:#888;margin-top:3px">REPORTE DE VENTAS</div></div>
-      <div><div class="badge">${MONTHS[month-1].toUpperCase()} ${year}</div><div class="meta">Generado: ${new Date().toLocaleDateString("es-MX")}</div></div>
+      <div>
+        <div class="brand">ALPHA <span>DETAILING</span></div>
+        <div class="brand-sub">Reporte de ventas</div>
+      </div>
+      <div style="text-align:right">
+        <div class="badge">${MONTHS[month-1].toUpperCase()} ${year}</div>
+        <div class="meta">Generado <span>${new Date().toLocaleDateString("es-MX")}</span></div>
+        ${pctChange!==null?`<div class="meta">vs ${MONTHS_SHORT[prevM-1]} <span style="color:${pctChange>=0?"#22c55e":"#ef4444"}">${pctChange>=0?"↑":"↓"}${Math.abs(pctChange)}%</span></div>`:""}
+      </div>
     </div>
-    <div style="padding:0 4px">
     <div class="kpis">
       <div class="kpi"><div class="kpi-val">${fmt(calTotal)}</div><div class="kpi-lbl">Total del mes</div></div>
       <div class="kpi"><div class="kpi-val">${calServices.length}</div><div class="kpi-lbl">Servicios</div></div>
       <div class="kpi"><div class="kpi-val">${fmt(ticketProm)}</div><div class="kpi-lbl">Ticket promedio</div></div>
-      <div class="kpi"><div class="kpi-val">${pctChange!==null?(pctChange>=0?"↑":"↓")+Math.abs(pctChange)+"%":"—"}</div><div class="kpi-lbl">vs mes anterior</div></div>
+      <div class="kpi"><div class="kpi-val">${calServices.filter(s=>s.status==="paid").length}</div><div class="kpi-lbl">Cobrados</div></div>
     </div>
-    <div class="section-title">Origen de clientes</div>
-    <table><thead><tr><th>Origen</th><th>Cantidad</th><th>Servicios</th><th style="text-align:right">Total</th></tr></thead>
-    <tbody>${originRows}${noOriginRow}<tr class="total-row"><td colspan="3">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table>
-    <div class="section-title">Detalle de servicios</div>
+    <div class="sec">Origen de clientes</div>
+    <table><thead><tr><th>Origen</th><th style="text-align:center">Cantidad</th><th>Servicios</th><th style="text-align:right">Total</th></tr></thead>
+    <tbody>${originRows}${noOriginRow}
+    <tr class="total-row"><td colspan="3">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr>
+    </tbody></table>
+    <div class="sec">Detalle de servicios</div>
     <table><thead><tr><th>Día</th><th>Servicio</th><th>Vehículo</th><th>Cliente</th><th>Origen</th><th style="text-align:right">Monto</th></tr></thead>
-    <tbody>${rows}<tr class="total-row"><td colspan="5">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table>
-    <div class="footer"><div class="footer-brand">ALPHA <span>DETAILING</span></div><div class="footer-note">Reporte interno confidencial</div></div>
-    </div></body></html>`);
-    win.document.close();setTimeout(()=>win.print(),600);
+    <tbody>${rows}
+    <tr class="total-row"><td colspan="5">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr>
+    </tbody></table>
+    <div class="footer">
+      <div class="footer-brand">ALPHA <span>DETAILING</span></div>
+      <div class="footer-note">Reporte interno — confidencial</div>
+    </div>
+    </body></html>`);
+    win.document.close();
+    // Close button overlay so user can go back
+    const closeBar=win.document.createElement("div");
+    closeBar.style.cssText="position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,.9);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:999;font-family:sans-serif";
+    closeBar.innerHTML='<span style="color:#c9a84c;font-size:12px;font-weight:700;letter-spacing:2px">ALPHA DETAILING — REPORTE</span><button onclick="window.close()" style="background:#c9a84c;border:none;border-radius:6px;color:#000;padding:6px 14px;font-weight:700;font-size:12px;cursor:pointer">✕ Cerrar</button>';
+    win.document.body.appendChild(closeBar);
+    win.document.body.style.paddingTop="44px";
+    setTimeout(()=>win.print(),600);
   };
 
   return React.createElement("div",{style:{padding:"16px 14px calc(60px + env(safe-area-inset-bottom,0px))",maxWidth:520,margin:"0 auto"}},
