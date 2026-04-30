@@ -335,13 +335,13 @@ function CatalogModule({showToast}){
   );
 
   return React.createElement("div",{style:{padding:"16px 14px 60px",maxWidth:520,margin:"0 auto"}},
-    React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,letterSpacing:4,textTransform:"uppercase",color:"#5a5a5a",textAlign:"center",marginBottom:18}},"Catálogo de Servicios"),
+    React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,letterSpacing:4,textTransform:"uppercase",color:"#909090",textAlign:"center",marginBottom:18}},"Catálogo de Servicios"),
     Object.entries(groups).map(([group,items])=>
       React.createElement("div",{key:group,style:{marginBottom:20}},
         React.createElement("div",{className:"sec-label",style:{marginTop:0}},group),
         items.map(s=>
-          React.createElement("div",{key:s.id,style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}},React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:2,flexShrink:0}},React.createElement("button",{onClick:()=>moveUp(s._i),style:{background:"none",border:"1px solid #2a2a2a",borderRadius:4,color:"#5a5a5a",padding:"2px 6px",cursor:"pointer",fontSize:10,lineHeight:1}},"▲"),React.createElement("button",{onClick:()=>moveDown(s._i),style:{background:"none",border:"1px solid #2a2a2a",borderRadius:4,color:"#5a5a5a",padding:"2px 6px",cursor:"pointer",fontSize:10,lineHeight:1}},"▼")),
-            React.createElement("div",{style:{flex:1,minWidth:0}},React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#fff",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},s.name),React.createElement("div",{style:{fontSize:10,color:"#5a5a5a",marginTop:3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},s.sizes.map(sz=>`${sz.label}: ${fmt(sz.price)}`).join(" · "))),
+          React.createElement("div",{key:s.id,style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,padding:"12px 14px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center",gap:8}},React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:2,flexShrink:0}},React.createElement("button",{onClick:()=>moveUp(s._i),style:{background:"none",border:"1px solid #2a2a2a",borderRadius:4,color:"#909090",padding:"2px 6px",cursor:"pointer",fontSize:10,lineHeight:1}},"▲"),React.createElement("button",{onClick:()=>moveDown(s._i),style:{background:"none",border:"1px solid #2a2a2a",borderRadius:4,color:"#909090",padding:"2px 6px",cursor:"pointer",fontSize:10,lineHeight:1}},"▼")),
+            React.createElement("div",{style:{flex:1,minWidth:0}},React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#fff",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},s.name),React.createElement("div",{style:{fontSize:10,color:"#909090",marginTop:3,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},s.sizes.map(sz=>`${sz.label}: ${fmt(sz.price)}`).join(" · "))),
             React.createElement("div",{style:{display:"flex",gap:6}},
               React.createElement("button",{onClick:()=>startEdit(s._i),style:{background:"rgba(201,168,76,.12)",border:"1px solid rgba(201,168,76,.3)",borderRadius:7,color:"#c9a84c",padding:"6px 10px",cursor:"pointer",fontSize:13}},"✏️"),
               React.createElement("button",{onClick:()=>deleteService(s._i),style:{background:"rgba(239,68,68,.1)",border:"1px solid rgba(239,68,68,.2)",borderRadius:7,color:"#ef4444",padding:"6px 10px",cursor:"pointer",fontSize:12}},"×")
@@ -485,7 +485,7 @@ function CalendarModule({showToast,cal,setCal,goToQuoterWithDate}){
         React.createElement("div",{className:"month-title"},`${MONTHS[month-1]} ${year}`),
         React.createElement("button",{className:"nav-btn",onClick:nextMonth},"›")
       ),
-      React.createElement("p",{style:{fontSize:9,letterSpacing:3,color:"#5a5a5a",textTransform:"uppercase",marginTop:4}},"Toca un día para editarlo"),
+      React.createElement("p",{style:{fontSize:9,letterSpacing:3,color:"#909090",textTransform:"uppercase",marginTop:4}},"Toca un día para editarlo"),
       React.createElement("div",{style:{display:"flex",gap:8,justifyContent:"center",alignItems:"center",marginTop:8,flexWrap:"wrap"}},
         React.createElement("div",{style:{display:"inline-flex",alignItems:"center",gap:5,padding:"3px 12px",borderRadius:20,fontSize:10,fontWeight:700,letterSpacing:1,textTransform:"uppercase",background:`${stColor}18`,color:stColor,border:`1px solid ${stColor}44`}},
           React.createElement("div",{style:{width:6,height:6,borderRadius:"50%",background:stColor,animation:syncStatus==="saving"?"pulse .7s infinite":"none"}}),
@@ -520,7 +520,7 @@ function CalendarModule({showToast,cal,setCal,goToQuoterWithDate}){
           [{t:"worked",e:"🟡",l:"Servicio\nAgendado"},{t:"available",e:"🟢",l:"Disponible"},{t:"free",e:"🔴",l:"No\nDisponible"}].map(({t,e,l})=>{
             const active=sel===t;const ac=t==="worked"?"#c9a84c":t==="available"?"#22c55e":"#ef4444";
             return React.createElement("div",{key:t,className:"type-card",style:{borderColor:active?ac:"#2a2a2a",background:active?`${ac}18`:"#161616"},onClick:()=>setSel(t)},
-              React.createElement("span",{className:"type-emoji"},e),React.createElement("span",{className:"type-lbl",style:{color:active?ac:"#5a5a5a"}},l)
+              React.createElement("span",{className:"type-emoji"},e),React.createElement("span",{className:"type-lbl",style:{color:active?ac:"#909090"}},l)
             );
           })
         ),
@@ -532,7 +532,7 @@ function CalendarModule({showToast,cal,setCal,goToQuoterWithDate}){
             React.createElement("button",{onClick:()=>setShowSvcPicker(p=>!p),style:{padding:"0 12px",background:showSvcPicker?"#c9a84c":"rgba(201,168,76,.12)",border:"1px solid rgba(201,168,76,.3)",borderRadius:8,color:showSvcPicker?"#000":"#c9a84c",cursor:"pointer",fontSize:16,flexShrink:0}},"☰")
           ),
           showSvcPicker&&React.createElement("div",{style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,padding:"10px",marginBottom:10,maxHeight:240,overflowY:"auto"}},
-            React.createElement("div",{style:{fontSize:9,color:"#5a5a5a",letterSpacing:1,textTransform:"uppercase",marginBottom:8,textAlign:"center",fontFamily:"'Barlow',sans-serif"}},
+            React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:1,textTransform:"uppercase",marginBottom:8,textAlign:"center",fontFamily:"'Barlow',sans-serif"}},
               form.service?"Toca para agregar al servicio actual ✚":"Selecciona un servicio"
             ),
             Object.entries(svcGroups).map(([group,items])=>
@@ -584,7 +584,7 @@ function CalendarModule({showToast,cal,setCal,goToQuoterWithDate}){
           React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:5,marginTop:10}},
             SERVICE_STATUSES.map(st=>{
               const active=form.status===st.id;
-              return React.createElement("button",{key:st.id,onClick:()=>setForm(f=>({...f,status:st.id})),style:{padding:"7px 2px",borderRadius:7,border:`1.5px solid ${active?st.color:"#2a2a2a"}`,background:active?`${st.color}18`:"transparent",color:active?st.color:"#5a5a5a",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"'Barlow',sans-serif",lineHeight:1.3,textAlign:"center"}},`${st.emoji}\n${st.label}`);
+              return React.createElement("button",{key:st.id,onClick:()=>setForm(f=>({...f,status:st.id})),style:{padding:"7px 2px",borderRadius:7,border:`1.5px solid ${active?st.color:"#2a2a2a"}`,background:active?`${st.color}18`:"transparent",color:active?st.color:"#909090",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"'Barlow',sans-serif",lineHeight:1.3,textAlign:"center"}},`${st.emoji}\n${st.label}`);
             })
           ),
           React.createElement("div",{style:{marginTop:8}},
@@ -608,7 +608,7 @@ function CalendarModule({showToast,cal,setCal,goToQuoterWithDate}){
     exportView&&React.createElement("div",{className:"export-overlay"},
       React.createElement("div",{className:"export-inner"},
         React.createElement("div",{className:"export-bar"},
-          React.createElement("span",{style:{fontSize:11,letterSpacing:3,color:"#5a5a5a",textTransform:"uppercase"}},"Vista para clientes"),
+          React.createElement("span",{style:{fontSize:11,letterSpacing:3,color:"#909090",textTransform:"uppercase"}},"Vista para clientes"),
           React.createElement("button",{className:"close-btn",onClick:()=>setExportView(false)},"✕ Cerrar")
         ),
         React.createElement("div",{ref:exportRef,id:"cal-export-canvas"},
@@ -638,19 +638,19 @@ function DatePicker({value,onChange}){
   const days=getDaysInMonth(py,pm);
   const selDay=value&&parseInt(value.split("-")[0])===py&&parseInt(value.split("-")[1])===pm?parseInt(value.split("-")[2]):null;
   return React.createElement("div",{style:{position:"relative"}},
-    React.createElement("button",{onClick:()=>setOpen(o=>!o),style:{width:"100%",background:"#161616",border:"1px solid #2a2a2a",borderRadius:8,color:value?"#d0d0d0":"#5a5a5a",padding:"11px 12px",fontFamily:"'Barlow',sans-serif",fontSize:14,textAlign:"left",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}},value?fmtDateNice(value):"Seleccionar fecha",React.createElement("span",{style:{color:"#c9a84c"}},"📅")),
+    React.createElement("button",{onClick:()=>setOpen(o=>!o),style:{width:"100%",background:"#161616",border:"1px solid #2a2a2a",borderRadius:8,color:value?"#d0d0d0":"#909090",padding:"11px 12px",fontFamily:"'Barlow',sans-serif",fontSize:14,textAlign:"left",cursor:"pointer",display:"flex",justifyContent:"space-between",alignItems:"center"}},value?fmtDateNice(value):"Seleccionar fecha",React.createElement("span",{style:{color:"#c9a84c"}},"📅")),
     open&&React.createElement("div",{style:{position:"absolute",top:"calc(100% + 6px)",left:0,right:0,zIndex:200,background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:12,padding:14,boxShadow:"0 12px 40px rgba(0,0,0,.6)"}},
       React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}},
         React.createElement("button",{onClick:()=>{if(pm===1){setPm(12);setPy(y=>y-1);}else setPm(m=>m-1);},style:{background:"none",border:"none",color:"#c9a84c",fontSize:20,cursor:"pointer",padding:"0 6px"}},"‹"),
         React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:15,fontWeight:700,letterSpacing:2,color:"#fff"}},`${MONTHS_SHORT[pm-1]} ${py}`),
         React.createElement("button",{onClick:()=>{if(pm===12){setPm(1);setPy(y=>y+1);}else setPm(m=>m+1);},style:{background:"none",border:"none",color:"#c9a84c",fontSize:20,cursor:"pointer",padding:"0 6px"}},"›")
       ),
-      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:4}},DAY_SHORT.map(d=>React.createElement("div",{key:d,style:{textAlign:"center",fontSize:8,color:"#5a5a5a",fontWeight:700,padding:"2px 0"}},d))),
+      React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2,marginBottom:4}},DAY_SHORT.map(d=>React.createElement("div",{key:d,style:{textAlign:"center",fontSize:8,color:"#909090",fontWeight:700,padding:"2px 0"}},d))),
       React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(7,1fr)",gap:2}},
         [...Array(offset)].map((_,i)=>React.createElement("div",{key:`e${i}`})),
         [...Array(days)].map((_,i)=>{const d=i+1;const isSel=selDay===d;const isT=d===today.getDate()&&pm===today.getMonth()+1&&py===today.getFullYear();return React.createElement("button",{key:d,onClick:()=>{onChange(`${py}-${pm}-${d}`);setOpen(false);},style:{padding:"6px 2px",borderRadius:6,border:"none",cursor:"pointer",fontSize:12,fontWeight:isSel?700:400,background:isSel?"#c9a84c":isT?"rgba(201,168,76,.15)":"transparent",color:isSel?"#000":isT?"#c9a84c":"#d0d0d0"}},d);})
       ),
-      React.createElement("button",{onClick:()=>{onChange("");setOpen(false);},style:{width:"100%",marginTop:10,padding:"7px",background:"transparent",border:"1px solid #2a2a2a",borderRadius:6,color:"#5a5a5a",fontSize:11,cursor:"pointer",fontFamily:"'Barlow',sans-serif"}},"Limpiar fecha")
+      React.createElement("button",{onClick:()=>{onChange("");setOpen(false);},style:{width:"100%",marginTop:10,padding:"7px",background:"transparent",border:"1px solid #2a2a2a",borderRadius:6,color:"#909090",fontSize:11,cursor:"pointer",fontFamily:"'Barlow',sans-serif"}},"Limpiar fecha")
     )
   );
 }
@@ -665,7 +665,7 @@ function ClientAutocomplete({value,onChange,onSelect,placeholder}){
     open&&filtered.length>0&&React.createElement("div",{style:{position:"absolute",top:"calc(100% + 4px)",left:0,right:0,zIndex:300,background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,overflow:"hidden",boxShadow:"0 8px 30px rgba(0,0,0,.5)"}},
       filtered.map((c,i)=>React.createElement("div",{key:i,onMouseDown:()=>{onSelect(c);setOpen(false);},style:{padding:"10px 14px",cursor:"pointer",borderBottom:i<filtered.length-1?"1px solid #2a2a2a":"none",display:"flex",justifyContent:"space-between",alignItems:"center"}},
         React.createElement("div",null,React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#d0d0d0"}},c.nombre),c.modelo&&React.createElement("div",{style:{fontSize:11,color:"#7dd3fc"}},c.modelo)),
-        c.tel&&React.createElement("div",{style:{fontSize:11,color:"#5a5a5a"}},c.tel)
+        c.tel&&React.createElement("div",{style:{fontSize:11,color:"#909090"}},c.tel)
       ))
     )
   );
@@ -756,7 +756,7 @@ function QuoterModule({showToast,cal,prefillDate,onPrefillUsed}){
   const inp={className:"inp"};
 
   return React.createElement("div",{className:"quoter-wrap"},
-    React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,letterSpacing:4,textTransform:"uppercase",color:"#5a5a5a",textAlign:"center",marginBottom:18}},"Nueva Cotización"),
+    React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:11,letterSpacing:4,textTransform:"uppercase",color:"#909090",textAlign:"center",marginBottom:18}},"Nueva Cotización"),
 
     React.createElement("div",{className:"sec-label"},"Número & Fecha"),
     React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:10}},
@@ -792,7 +792,7 @@ function QuoterModule({showToast,cal,prefillDate,onPrefillUsed}){
             React.createElement("input",{...inp,style:{marginBottom:8},type:"number",value:s.price,placeholder:"0",onChange:e=>updateService(i,"price",e.target.value)}),
             React.createElement("label",{className:"field-label"},"Incluye (una por línea)"),
             React.createElement("textarea",{...inp,style:{height:70},value:(s.includes||[]).join("\n"),onChange:e=>updateService(i,"includes",e.target.value.split("\n"))}),
-            React.createElement("button",{onClick:()=>updateService(i,"isCustom",false),style:{marginTop:6,fontSize:11,color:"#5a5a5a",background:"none",border:"none",cursor:"pointer",padding:0}},"← Seleccionar del catálogo")
+            React.createElement("button",{onClick:()=>updateService(i,"isCustom",false),style:{marginTop:6,fontSize:11,color:"#909090",background:"none",border:"none",cursor:"pointer",padding:0}},"← Seleccionar del catálogo")
           )
         : React.createElement("div",null,
             React.createElement("div",{style:{display:"flex",gap:6,marginBottom:8}},
@@ -800,7 +800,7 @@ function QuoterModule({showToast,cal,prefillDate,onPrefillUsed}){
                 s.name?React.createElement("div",null,
                   React.createElement("div",{style:{fontSize:13,color:"#fff",fontWeight:600}},s.name+(s.size?` · ${s.size}`:"")),
                   s.price&&React.createElement("div",{style:{fontSize:12,color:"#c9a84c",fontWeight:700}},fmt(parseFloat(s.price)))
-                ):React.createElement("div",{style:{fontSize:13,color:"#5a5a5a"}},"Selecciona un servicio…")
+                ):React.createElement("div",{style:{fontSize:13,color:"#909090"}},"Selecciona un servicio…")
               ),
               React.createElement("button",{onClick:()=>setShowSvcPicker(showSvcPicker===i?null:i),style:{padding:"0 12px",background:showSvcPicker===i?"#c9a84c":"rgba(201,168,76,.12)",border:"1px solid rgba(201,168,76,.3)",borderRadius:8,color:showSvcPicker===i?"#000":"#c9a84c",cursor:"pointer",fontSize:16,flexShrink:0}},"☰")
             ),
@@ -820,13 +820,13 @@ function QuoterModule({showToast,cal,prefillDate,onPrefillUsed}){
                           )
                         )
                   ),
-                  React.createElement("button",{onClick:()=>{updateService(i,"isCustom",true);setShowSvcPicker(null);},style:{width:"100%",padding:"7px",background:"transparent",border:"1px dashed #5a5a5a",borderRadius:6,color:"#5a5a5a",fontSize:11,cursor:"pointer",marginTop:4}},"+ Servicio personalizado")
+                  React.createElement("button",{onClick:()=>{updateService(i,"isCustom",true);setShowSvcPicker(null);},style:{width:"100%",padding:"7px",background:"transparent",border:"1px dashed #5a5a5a",borderRadius:6,color:"#909090",fontSize:11,cursor:"pointer",marginTop:4}},"+ Servicio personalizado")
                 )
               )
             ),
             s.name&&React.createElement("div",null,
               (s.includes||[]).slice(0,3).map((inc,j)=>React.createElement("div",{key:j,className:"inc-item"},React.createElement("span",{style:{color:"#c9a84c"}},"✓"),inc)),
-              (s.includes||[]).length>3&&React.createElement("div",{style:{fontSize:10,color:"#5a5a5a",marginTop:2}},`+${s.includes.length-3} más incluidos`),
+              (s.includes||[]).length>3&&React.createElement("div",{style:{fontSize:10,color:"#909090",marginTop:2}},`+${s.includes.length-3} más incluidos`),
               React.createElement("div",{className:"pkg-price-row"},fmt(parseFloat(s.price)||0))
             )
           )
@@ -862,7 +862,7 @@ function QuoterModule({showToast,cal,prefillDate,onPrefillUsed}){
     // ── QUOTE PREVIEW ──
     preview&&React.createElement("div",{className:"qpreview-overlay"},
       React.createElement("div",{style:{position:"sticky",top:0,zIndex:500,background:"rgba(10,10,10,.95)",backdropFilter:"blur(8px)",padding:"calc(env(safe-area-inset-top,14px) + 10px) 16px 10px",display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:"1px solid #2a2a2a"}},
-        React.createElement("span",{style:{fontSize:11,letterSpacing:3,color:"#5a5a5a",textTransform:"uppercase",fontFamily:"'Barlow',sans-serif"}},"Vista Previa"),
+        React.createElement("span",{style:{fontSize:11,letterSpacing:3,color:"#909090",textTransform:"uppercase",fontFamily:"'Barlow',sans-serif"}},"Vista Previa"),
         React.createElement("button",{onClick:()=>setPreview(false),style:{background:"#ef4444",border:"none",borderRadius:20,color:"#fff",padding:"8px 18px",fontFamily:"'Barlow',sans-serif",fontWeight:700,fontSize:13,cursor:"pointer",letterSpacing:.5}},"✕ Cerrar")
       ),
       React.createElement("div",{className:"qpreview-inner"},
@@ -1003,6 +1003,7 @@ function VentasModule({cal}){
   const today=new Date();
   const[year,setYear]=useState(today.getFullYear());
   const[month,setMonth]=useState(today.getMonth()+1);
+  const[showReport,setShowReport]=useState(false);
   const[goalInput,setGoalInput]=useState("");
   const[showGoalEdit,setShowGoalEdit]=useState(false);
   const GOAL_KEY="alpha-goal-v1";
@@ -1029,13 +1030,67 @@ function VentasModule({cal}){
 
   const generatePDF=()=>{
     const win=window.open("","_blank");
-    const rows=calServices.map(s=>`<tr><td>${s.day}</td><td>${s.serviceNorm||s.service||"—"}</td><td>${s.vehicle||"—"}</td><td>${s.client||"—"}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${s.price?fmt(parseFloat(s.price)):"—"}</td><td>${SERVICE_STATUSES.find(st=>st.id===s.status)?.label||"—"}</td></tr>`).join("");
-    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte ${MONTHS[month-1]} ${year}</title><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Helvetica Neue',sans-serif;background:#1a1a1a;color:#d0d0d0;padding:32px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #333}.brand{font-size:36px;font-weight:900;letter-spacing:8px;color:#fff}.brand span{color:#c9a84c}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}.kpi{background:#222;border:1px solid #333;border-radius:10px;padding:14px 12px;text-align:center}.kpi-val{font-size:22px;font-weight:700;color:#c9a84c}.kpi-lbl{font-size:9px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px}table{width:100%;border-collapse:collapse;font-size:12px}th{background:#222;color:#c9a84c;text-transform:uppercase;letter-spacing:1px;font-size:9px;padding:10px 12px;text-align:left;border-bottom:1px solid #333}td{padding:10px 12px;border-bottom:1px solid #222;color:#d0d0d0}.total-row td{background:#222;font-weight:700;color:#fff;border-top:2px solid #c9a84c}.footer{margin-top:24px;text-align:center;font-size:10px;color:#555;letter-spacing:2px}@media print{body{background:#1a1a1a!important}}</style></head><body>
-    <div class="header"><div><div class="brand">ALPHA <span>DETAILING</span></div><div style="font-size:10px;letter-spacing:3px;color:#888;margin-top:4px">REPORTE DE VENTAS</div></div><div style="text-align:right"><div style="background:#c9a84c;color:#000;padding:5px 14px;font-size:11px;font-weight:700;letter-spacing:2px">${MONTHS[month-1].toUpperCase()} ${year}</div><div style="font-size:11px;color:#888;margin-top:8px">Generado: ${new Date().toLocaleDateString("es-MX")}</div></div></div>
-    <div class="kpis"><div class="kpi"><div class="kpi-val">${fmt(calTotal)}</div><div class="kpi-lbl">Total del mes</div></div><div class="kpi"><div class="kpi-val">${calServices.length}</div><div class="kpi-lbl">Servicios</div></div><div class="kpi"><div class="kpi-val">${fmt(ticketProm)}</div><div class="kpi-lbl">Ticket promedio</div></div><div class="kpi"><div class="kpi-val">${pctChange!==null?(pctChange>=0?"↑":"↓")+Math.abs(pctChange)+"%":"—"}</div><div class="kpi-lbl">vs mes anterior</div></div></div>
-    <table><thead><tr><th>Día</th><th>Servicio</th><th>Vehículo</th><th>Cliente</th><th style="text-align:right">Monto</th><th>Estado</th></tr></thead><tbody>${rows}<tr class="total-row"><td colspan="4">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td><td></td></tr></tbody></table>
-    <div class="footer">ALPHA DETAILING — Reporte interno confidencial</div></body></html>`);
-    win.document.close();setTimeout(()=>win.print(),500);
+    const rows=calServices.map(s=>{
+      const orig=ORIGINS.find(o=>o.id===s.origin);
+      return `<tr><td>${s.day}</td><td>${s.serviceNorm||s.service||"—"}</td><td>${s.vehicle||"—"}</td><td>${s.client||"—"}</td><td>${orig?orig.emoji+" "+orig.label:"—"}</td><td style="text-align:right;font-weight:700;color:#b8860b">${s.price?fmt(parseFloat(s.price)):"—"}</td></tr>`;
+    }).join("");
+    // Origin breakdown
+    const originRows=ORIGINS.map(o=>{
+      const svcs=calServices.filter(s=>s.origin===o.id);
+      if(!svcs.length) return "";
+      const total=svcs.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+      const svcNames=[...new Set(svcs.map(s=>s.serviceNorm||s.service))].join(", ");
+      return `<tr><td>${o.emoji} ${o.label}</td><td>${svcs.length}</td><td>${svcNames}</td><td style="text-align:right;font-weight:700;color:#b8860b">${fmt(total)}</td></tr>`;
+    }).filter(Boolean).join("");
+    const noOrigin=calServices.filter(s=>!s.origin);
+    const noOriginRow=noOrigin.length?`<tr><td>— Sin origen</td><td>${noOrigin.length}</td><td>${[...new Set(noOrigin.map(s=>s.serviceNorm||s.service))].join(", ")}</td><td style="text-align:right">${fmt(noOrigin.reduce((a,s)=>a+(parseFloat(s.price)||0),0))}</td></tr>`:"";
+
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Reporte ${MONTHS[month-1]} ${year} — Alpha Detailing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      @page{margin:10mm;size:Letter}
+      body{font-family:'Barlow','Helvetica Neue',sans-serif;background:#fff;color:#111;zoom:0.82}
+      .header{background:#111;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;margin-bottom:0}
+      .brand{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:800;letter-spacing:6px;color:#fff}
+      .brand span{color:#c9a84c}
+      .badge{background:#c9a84c;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:5px 14px;display:inline-block;margin-bottom:6px}
+      .meta{font-size:11px;color:#ccc;text-align:right;line-height:1.8}
+      .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}
+      .kpi{border:1.5px solid #e5e7eb;border-radius:8px;padding:10px 8px;text-align:center}
+      .kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;color:#c9a84c}
+      .kpi-lbl{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+      .section-title{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin:12px 0 6px;padding-bottom:5px;border-bottom:1.5px solid #e5e7eb}
+      table{width:100%;border-collapse:collapse;font-size:11px}
+      th{background:#f9fafb;color:#888;text-transform:uppercase;letter-spacing:.5px;font-size:8px;padding:7px 8px;text-align:left;border-bottom:1px solid #e5e7eb}
+      td{padding:7px 8px;border-bottom:1px solid #f3f4f6;color:#333}
+      tr:nth-child(even) td{background:#fafafa}
+      .total-row td{background:#f9fafb;font-weight:700;color:#111;border-top:2px solid #c9a84c}
+      .footer{margin-top:16px;display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #e5e7eb}
+      .footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:4px;color:#111}
+      .footer-brand span{color:#c9a84c}
+      .footer-note{font-size:9px;color:#aaa;font-style:italic}
+    </style></head><body>
+    <div class="header">
+      <div><div class="brand">ALPHA <span>DETAILING</span></div><div style="font-size:9px;letter-spacing:3px;color:#888;margin-top:3px">REPORTE DE VENTAS</div></div>
+      <div><div class="badge">${MONTHS[month-1].toUpperCase()} ${year}</div><div class="meta">Generado: ${new Date().toLocaleDateString("es-MX")}</div></div>
+    </div>
+    <div style="padding:0 4px">
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-val">${fmt(calTotal)}</div><div class="kpi-lbl">Total del mes</div></div>
+      <div class="kpi"><div class="kpi-val">${calServices.length}</div><div class="kpi-lbl">Servicios</div></div>
+      <div class="kpi"><div class="kpi-val">${fmt(ticketProm)}</div><div class="kpi-lbl">Ticket promedio</div></div>
+      <div class="kpi"><div class="kpi-val">${pctChange!==null?(pctChange>=0?"↑":"↓")+Math.abs(pctChange)+"%":"—"}</div><div class="kpi-lbl">vs mes anterior</div></div>
+    </div>
+    <div class="section-title">Origen de clientes</div>
+    <table><thead><tr><th>Origen</th><th>Cantidad</th><th>Servicios</th><th style="text-align:right">Total</th></tr></thead>
+    <tbody>${originRows}${noOriginRow}<tr class="total-row"><td colspan="3">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table>
+    <div class="section-title">Detalle de servicios</div>
+    <table><thead><tr><th>Día</th><th>Servicio</th><th>Vehículo</th><th>Cliente</th><th>Origen</th><th style="text-align:right">Monto</th></tr></thead>
+    <tbody>${rows}<tr class="total-row"><td colspan="5">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table>
+    <div class="footer"><div class="footer-brand">ALPHA <span>DETAILING</span></div><div class="footer-note">Reporte interno confidencial</div></div>
+    </div></body></html>`);
+    win.document.close();setTimeout(()=>win.print(),600);
   };
 
   return React.createElement("div",{style:{padding:"16px 14px calc(60px + env(safe-area-inset-bottom,0px))",maxWidth:520,margin:"0 auto"}},
@@ -1044,30 +1099,30 @@ function VentasModule({cal}){
       React.createElement("div",{className:"month-title",style:{fontSize:"clamp(24px,7vw,42px)",minWidth:180}},`${MONTHS[month-1]} ${year}`),
       React.createElement("button",{className:"nav-btn",onClick:nextMonth},"›")
     ),
-    React.createElement("p",{style:{textAlign:"center",fontSize:9,letterSpacing:3,color:"#5a5a5a",textTransform:"uppercase",marginBottom:12}},"Control de ventas"),
+    React.createElement("p",{style:{textAlign:"center",fontSize:9,letterSpacing:3,color:"#909090",textTransform:"uppercase",marginBottom:12}},"Control de ventas"),
     // Goal banner
     React.createElement("div",{style:{maxWidth:520,margin:"0 auto 16px",background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:12,padding:"12px 16px"}},
       showGoalEdit
         ? React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
-            React.createElement("span",{style:{fontSize:12,color:"#5a5a5a",flexShrink:0}},"Meta $"),
+            React.createElement("span",{style:{fontSize:12,color:"#909090",flexShrink:0}},"Meta $"),
             React.createElement("input",{className:"inp",type:"number",value:goalInput,placeholder:"Ej. 150000",style:{flex:1},onChange:e=>setGoalInput(e.target.value)}),
             React.createElement("button",{onClick:()=>{saveGoal(year,month,parseFloat(goalInput)||0);setShowGoalEdit(false);},style:{padding:"8px 14px",background:"#c9a84c",border:"none",borderRadius:8,color:"#000",fontWeight:700,fontSize:12,cursor:"pointer",flexShrink:0}},"✓"),
             React.createElement("button",{onClick:()=>setShowGoalEdit(false),style:{padding:"8px 10px",background:"transparent",border:"1px solid #333",borderRadius:8,color:"#888",fontSize:12,cursor:"pointer",flexShrink:0}},"✕")
           )
         : React.createElement("div",null,
             React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:currentGoal>0?8:0}},
-              React.createElement("div",{style:{fontSize:10,color:"#5a5a5a",letterSpacing:2,textTransform:"uppercase"}},currentGoal>0?"Meta del mes":"Sin meta definida"),
+              React.createElement("div",{style:{fontSize:10,color:"#909090",letterSpacing:2,textTransform:"uppercase"}},currentGoal>0?"Meta del mes":"Sin meta definida"),
               React.createElement("button",{onClick:()=>{setGoalInput(String(currentGoal||""));setShowGoalEdit(true);},style:{fontSize:11,color:"#c9a84c",background:"none",border:"none",cursor:"pointer",padding:0}},currentGoal>0?"✏️ Editar":"+ Fijar meta")
             ),
             currentGoal>0&&React.createElement("div",null,
               React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},
                 React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:calTotal>=currentGoal?"#22c55e":"#c9a84c"}},fmt(calTotal)),
-                React.createElement("span",{style:{fontSize:12,color:"#5a5a5a"}},`de ${fmt(currentGoal)}`)
+                React.createElement("span",{style:{fontSize:12,color:"#909090"}},`de ${fmt(currentGoal)}`)
               ),
               React.createElement("div",{style:{height:8,background:"#2a2a2a",borderRadius:4,overflow:"hidden"}},
                 React.createElement("div",{style:{height:"100%",width:`${Math.min((calTotal/currentGoal)*100,100)}%`,background:calTotal>=currentGoal?"linear-gradient(90deg,#22c55e,#16a34a)":"linear-gradient(90deg,#c9a84c,#e0bb6e)",borderRadius:4,transition:"width .5s"}})
               ),
-              React.createElement("div",{style:{fontSize:10,color:"#5a5a5a",marginTop:5,textAlign:"right"}},
+              React.createElement("div",{style:{fontSize:10,color:"#909090",marginTop:5,textAlign:"right"}},
                 calTotal>=currentGoal
                   ? "🎉 ¡Meta alcanzada!"
                   : `Faltan ${fmt(currentGoal-calTotal)} · ${Math.round((calTotal/currentGoal)*100)}%`
@@ -1078,22 +1133,22 @@ function VentasModule({cal}){
     React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18}},
       React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",gridColumn:"1/-1"}},
         React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},
-          React.createElement("div",null,React.createElement("div",{style:{fontSize:9,color:"#5a5a5a",letterSpacing:2,textTransform:"uppercase",marginBottom:4}},"Total del mes"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:32,fontWeight:700,color:"#c9a84c"}},fmt(calTotal))),
-          pctChange!==null&&React.createElement("div",{style:{textAlign:"right"}},React.createElement("div",{style:{fontSize:20,fontWeight:700,color:pctChange>=0?"#22c55e":"#ef4444"}},(pctChange>=0?"↑":"↓")+Math.abs(pctChange)+"%"),React.createElement("div",{style:{fontSize:10,color:"#5a5a5a"}},`vs ${MONTHS_SHORT[prevM-1]}`))
+          React.createElement("div",null,React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:4}},"Total del mes"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:32,fontWeight:700,color:"#c9a84c"}},fmt(calTotal))),
+          pctChange!==null&&React.createElement("div",{style:{textAlign:"right"}},React.createElement("div",{style:{fontSize:20,fontWeight:700,color:pctChange>=0?"#22c55e":"#ef4444"}},(pctChange>=0?"↑":"↓")+Math.abs(pctChange)+"%"),React.createElement("div",{style:{fontSize:10,color:"#909090"}},`vs ${MONTHS_SHORT[prevM-1]}`))
         )
       ),
-      React.createElement("div",{className:"stat-card",style:{padding:"12px"}},React.createElement("div",{style:{fontSize:9,color:"#5a5a5a",letterSpacing:1,textTransform:"uppercase",marginBottom:4}},"Servicios"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:700,color:"#c9a84c"}},calServices.length)),
-      React.createElement("div",{className:"stat-card",style:{padding:"12px"}},React.createElement("div",{style:{fontSize:9,color:"#5a5a5a",letterSpacing:1,textTransform:"uppercase",marginBottom:4}},"Ticket promedio"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:700,color:"#c9a84c"}},fmt(ticketProm)))
+      React.createElement("div",{className:"stat-card",style:{padding:"12px"}},React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:1,textTransform:"uppercase",marginBottom:4}},"Servicios"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:700,color:"#c9a84c"}},calServices.length)),
+      React.createElement("div",{className:"stat-card",style:{padding:"12px"}},React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:1,textTransform:"uppercase",marginBottom:4}},"Ticket promedio"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:700,color:"#c9a84c"}},fmt(ticketProm)))
     ),
     calTotal>0&&React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",marginBottom:14}},
-      React.createElement("div",{style:{fontSize:9,color:"#5a5a5a",letterSpacing:2,textTransform:"uppercase",marginBottom:12}},"Ingresos por semana"),
+      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:12}},"Ingresos por semana"),
       React.createElement("div",{style:{display:"flex",gap:6,alignItems:"flex-end",height:80}},
-        weeks.map((w,i)=>{const pct=Math.max((w/maxWeek)*100,4);return React.createElement("div",{key:i,style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}},w>0&&React.createElement("div",{style:{fontSize:9,color:"#c9a84c",fontWeight:700}},w>=1000?(w/1000).toFixed(1)+"k":w),React.createElement("div",{style:{width:"100%",height:`${pct}%`,background:w>0?"linear-gradient(180deg,#e0bb6e,#c9a84c)":"#222",borderRadius:"4px 4px 0 0",minHeight:4}}),React.createElement("div",{style:{fontSize:8,color:"#5a5a5a"}},`S${i+1}`));})
+        weeks.map((w,i)=>{const pct=Math.max((w/maxWeek)*100,4);return React.createElement("div",{key:i,style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:4}},w>0&&React.createElement("div",{style:{fontSize:9,color:"#c9a84c",fontWeight:700}},w>=1000?(w/1000).toFixed(1)+"k":w),React.createElement("div",{style:{width:"100%",height:`${pct}%`,background:w>0?"linear-gradient(180deg,#e0bb6e,#c9a84c)":"#222",borderRadius:"4px 4px 0 0",minHeight:4}}),React.createElement("div",{style:{fontSize:8,color:"#909090"}},`S${i+1}`));})
       )
     ),
     // Origins breakdown
     Object.keys(originCount).length>0&&React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",marginBottom:14}},
-      React.createElement("div",{style:{fontSize:9,color:"#5a5a5a",letterSpacing:2,textTransform:"uppercase",marginBottom:12}},"Origen de clientes"),
+      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:12}},"Origen de clientes"),
       React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8}},
         ORIGINS.map(o=>{
           const count=originCount[o.id]||0;if(!count)return null;
@@ -1108,22 +1163,90 @@ function VentasModule({cal}){
         }),
         calServices.filter(s=>!s.origin).length>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
           React.createElement("span",{style:{fontSize:14,minWidth:22}},"—"),
-          React.createElement("div",{style:{flex:1,display:"flex",justifyContent:"space-between"}},React.createElement("span",{style:{fontSize:12,color:"#5a5a5a"}},"Sin origen"),React.createElement("span",{style:{fontSize:12,color:"#5a5a5a",fontWeight:700}},calServices.filter(s=>!s.origin).length))
+          React.createElement("div",{style:{flex:1,display:"flex",justifyContent:"space-between"}},React.createElement("span",{style:{fontSize:12,color:"#909090"}},"Sin origen"),React.createElement("span",{style:{fontSize:12,color:"#909090",fontWeight:700}},calServices.filter(s=>!s.origin).length))
         )
       )
     ),
     topSvc.length>0&&React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",marginBottom:14}},
-      React.createElement("div",{style:{fontSize:9,color:"#5a5a5a",letterSpacing:2,textTransform:"uppercase",marginBottom:10}},"Servicios más vendidos"),
+      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:10}},"Servicios más vendidos"),
       topSvc.map(([name,count],i)=>React.createElement("div",{key:i,style:{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:i<topSvc.length-1?"1px solid #222":"none"}},React.createElement("div",{style:{fontSize:12,color:"#d0d0d0",flex:1,paddingRight:8}},name),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:700,color:"#c9a84c"}},count,"x")))
     ),
     calServices.length>0&&React.createElement("div",null,
       React.createElement("div",{className:"sec-label",style:{marginTop:0}},"Detalle de servicios"),
       React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8}},
-        calServices.map((s,i)=>{const stObj=SERVICE_STATUSES.find(st=>st.id===s.status);return React.createElement("div",{key:i,style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,padding:"12px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}},React.createElement("div",null,React.createElement("div",{style:{fontSize:11,color:"#5a5a5a",marginBottom:3}},`Día ${s.day}${s.client?" · "+s.client:""}`),React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#d0d0d0"}},s.serviceNorm||s.service||"Servicio"),s.vehicle&&React.createElement("div",{style:{fontSize:11,color:"#7dd3fc",marginTop:2}},s.vehicle),stObj&&React.createElement("div",{style:{fontSize:10,color:stObj.color,marginTop:3,fontWeight:700}},`${stObj.emoji} ${stObj.label}`)),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:s.price?"#c9a84c":"#5a5a5a",flexShrink:0}},s.price?fmt(parseFloat(s.price)):"—"));})
+        calServices.map((s,i)=>{const stObj=SERVICE_STATUSES.find(st=>st.id===s.status);return React.createElement("div",{key:i,style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,padding:"12px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}},React.createElement("div",null,React.createElement("div",{style:{fontSize:11,color:"#909090",marginBottom:3}},`Día ${s.day}${s.client?" · "+s.client:""}`),React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#d0d0d0"}},s.serviceNorm||s.service||"Servicio"),s.vehicle&&React.createElement("div",{style:{fontSize:11,color:"#7dd3fc",marginTop:2}},s.vehicle),stObj&&React.createElement("div",{style:{fontSize:10,color:stObj.color,marginTop:3,fontWeight:700}},`${stObj.emoji} ${stObj.label}`)),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:s.price?"#c9a84c":"#909090",flexShrink:0}},s.price?fmt(parseFloat(s.price)):"—"));})
       )
     ),
-    calServices.length===0&&React.createElement("div",{style:{textAlign:"center",padding:"40px 0",color:"#5a5a5a"}},React.createElement("div",{style:{fontSize:32,marginBottom:12}},"📊"),React.createElement("div",{style:{fontSize:14}},"Sin datos este mes")),
-    calServices.length>0&&React.createElement("button",{onClick:generatePDF,style:{width:"100%",marginTop:16,padding:"14px",background:"#1c1c1c",border:"1px solid #c9a84c",borderRadius:10,color:"#c9a84c",fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:700,letterSpacing:2,textTransform:"uppercase",cursor:"pointer"}},"📄 Generar Reporte PDF")
+    calServices.length===0&&React.createElement("div",{style:{textAlign:"center",padding:"40px 0",color:"#909090"}},React.createElement("div",{style:{fontSize:32,marginBottom:12}},"📊"),React.createElement("div",{style:{fontSize:14}},"Sin datos este mes")),
+    calServices.length>0&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:16}},
+      React.createElement("button",{onClick:()=>setShowReport(true),style:{padding:"13px",background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,color:"#d0d0d0",fontFamily:"'Barlow',sans-serif",fontSize:13,fontWeight:600,cursor:"pointer"}},"📊 Ver reporte"),
+      React.createElement("button",{onClick:generatePDF,style:{padding:"13px",background:"#1c1c1c",border:"1px solid #c9a84c",borderRadius:10,color:"#c9a84c",fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,letterSpacing:1,textTransform:"uppercase",cursor:"pointer"}},"📄 PDF")
+    ),
+    // Full report overlay with back button
+    showReport&&React.createElement("div",{style:{position:"fixed",inset:0,background:"#0e0e0e",zIndex:400,overflowY:"auto"}},
+      React.createElement("div",{style:{position:"sticky",top:0,zIndex:10,background:"rgba(14,14,14,.95)",backdropFilter:"blur(8px)",padding:"calc(env(safe-area-inset-top,14px) + 10px) 16px 10px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #222"}},
+        React.createElement("button",{onClick:()=>setShowReport(false),style:{background:"none",border:"1px solid #333",borderRadius:8,color:"#d0d0d0",padding:"7px 14px",cursor:"pointer",fontSize:13,fontFamily:"'Barlow',sans-serif"}},"← Volver"),
+        React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:16,fontWeight:700,letterSpacing:3,color:"#c9a84c"}},"REPORTE "+MONTHS[month-1].toUpperCase()+" "+year),
+        React.createElement("button",{onClick:generatePDF,style:{marginLeft:"auto",background:"#c9a84c",border:"none",borderRadius:8,color:"#000",padding:"7px 14px",cursor:"pointer",fontSize:12,fontWeight:700,fontFamily:"'Barlow',sans-serif"}},"📄 PDF")
+      ),
+      React.createElement("div",{style:{padding:"16px 14px calc(60px + env(safe-area-inset-bottom,0px))",maxWidth:520,margin:"0 auto"}},
+        // KPIs
+        React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:16}},
+          [{v:fmt(calTotal),l:"Total"},{v:calServices.length,l:"Servicios"},{v:fmt(ticketProm),l:"Ticket prom."}].map(({v,l})=>
+            React.createElement("div",{key:l,className:"stat-card",style:{padding:"10px 8px",textAlign:"center"}},
+              React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:"#c9a84c"}},v),
+              React.createElement("div",{style:{fontSize:9,color:"#909090",textTransform:"uppercase",letterSpacing:1,marginTop:2}},l)
+            )
+          )
+        ),
+        // Origin breakdown with services
+        React.createElement("div",{style:{fontSize:10,color:"#c9a84c",letterSpacing:2,textTransform:"uppercase",fontWeight:700,marginBottom:10}},"Por origen de cliente"),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8,marginBottom:20}},
+          [...ORIGINS.map(o=>{
+            const svcs=calServices.filter(s=>s.origin===o.id);
+            if(!svcs.length) return null;
+            const total=svcs.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
+            return React.createElement("div",{key:o.id,style:{background:"#1c1c1c",border:`1px solid ${o.color}44`,borderRadius:10,padding:"12px 14px"}},
+              React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}},
+                React.createElement("div",{style:{display:"flex",alignItems:"center",gap:6}},
+                  React.createElement("span",{style:{fontSize:16}},o.emoji),
+                  React.createElement("span",{style:{fontSize:13,fontWeight:700,color:o.color}},o.label)
+                ),
+                React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:o.color}},fmt(total))
+              ),
+              svcs.map((s,i)=>React.createElement("div",{key:i,style:{display:"flex",justifyContent:"space-between",fontSize:11,color:"#888",padding:"3px 0",borderTop:"1px solid #2a2a2a"}},
+                React.createElement("span",null,`Día ${s.day} · ${s.serviceNorm||s.service||"—"}${s.vehicle?" · "+s.vehicle:""}`),
+                React.createElement("span",{style:{color:"#d0d0d0",fontWeight:600,flexShrink:0,marginLeft:8}},s.price?fmt(parseFloat(s.price)):"—")
+              ))
+            );
+          }).filter(Boolean),
+          calServices.filter(s=>!s.origin).length>0&&React.createElement("div",{key:"none",style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,padding:"12px 14px"}},
+            React.createElement("div",{style:{fontSize:13,fontWeight:700,color:"#909090",marginBottom:8}},"— Sin origen registrado"),
+            calServices.filter(s=>!s.origin).map((s,i)=>React.createElement("div",{key:i,style:{display:"flex",justifyContent:"space-between",fontSize:11,color:"#888",padding:"3px 0",borderTop:"1px solid #2a2a2a"}},
+              React.createElement("span",null,`Día ${s.day} · ${s.serviceNorm||s.service||"—"}`),
+              React.createElement("span",{style:{color:"#d0d0d0",fontWeight:600,flexShrink:0,marginLeft:8}},s.price?fmt(parseFloat(s.price)):"—")
+            ))
+          )]
+        ),
+        // Services detail
+        React.createElement("div",{style:{fontSize:10,color:"#c9a84c",letterSpacing:2,textTransform:"uppercase",fontWeight:700,marginBottom:10}},"Detalle de servicios"),
+        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:6}},
+          calServices.map((s,i)=>{
+            const stObj=SERVICE_STATUSES.find(st=>st.id===s.status);
+            const origObj=ORIGINS.find(o=>o.id===s.origin);
+            return React.createElement("div",{key:i,style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:8,padding:"10px 12px",display:"flex",justifyContent:"space-between",alignItems:"center"}},
+              React.createElement("div",null,
+                React.createElement("div",{style:{fontSize:10,color:"#909090",marginBottom:2}},`Día ${s.day}${s.client?" · "+s.client:""}${origObj?" · "+origObj.emoji+origObj.label:""}`),
+                React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#d0d0d0"}},s.serviceNorm||s.service||"—"),
+                s.vehicle&&React.createElement("div",{style:{fontSize:10,color:"#7dd3fc"}},s.vehicle),
+                stObj&&React.createElement("div",{style:{fontSize:10,color:stObj.color,fontWeight:700}},stObj.emoji+" "+stObj.label)
+              ),
+              React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:17,fontWeight:700,color:s.price?"#c9a84c":"#909090",flexShrink:0}},s.price?fmt(parseFloat(s.price)):"—")
+            );
+          })
+        )
+      )
+    )
   );
 }
 
