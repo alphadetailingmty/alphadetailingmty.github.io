@@ -46,6 +46,19 @@
         const snap = await getDoc(doc(db, "alpha", "calendar"));
         if (snap.exists()) { try { return JSON.parse(snap.data().data); } catch(e) {} }
         return null;
+      },
+      saveGastos: async (year, month, data) => {
+        await setDoc(doc(db, "alpha", `gastos-${year}-${month}`), { data: JSON.stringify(data) });
+      },
+      getGastos: async (year, month) => {
+        const snap = await getDoc(doc(db, "alpha", `gastos-${year}-${month}`));
+        if (snap.exists()) { try { return JSON.parse(snap.data().data); } catch(e) {} }
+        return null;
+      },
+      onGastosChange: (year, month, callback) => {
+        return onSnapshot(doc(db, "alpha", `gastos-${year}-${month}`), (snap) => {
+          if (snap.exists()) { try { callback(JSON.parse(snap.data().data)); } catch(e) {} }
+        });
       }
     };
 

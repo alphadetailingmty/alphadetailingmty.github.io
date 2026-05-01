@@ -42,6 +42,20 @@ function loadGastos(year, month) {
 }
 function saveGastos(year, month, data) {
   try { localStorage.setItem(`${GASTOS_KEY}-${year}-${month}`, JSON.stringify(data)); } catch(e) {}
+  // Sync to Firebase
+  if(window.__firebase?.saveGastos) window.__firebase.saveGastos(year, month, data).catch(()=>{});
+}
+async function loadGastosRemote(year, month) {
+  if(window.__firebase?.getGastos) {
+    try {
+      const remote = await window.__firebase.getGastos(year, month);
+      if(remote) {
+        try { localStorage.setItem(`${GASTOS_KEY}-${year}-${month}`, JSON.stringify(remote)); } catch(e) {}
+        return remote;
+      }
+    } catch(e) {}
+  }
+  return loadGastos(year, month);
 }
 const QUOTE_KEY    = "alpha-quotes-v2";
 const QNUM_KEY     = "alpha-quote-num";
@@ -1019,7 +1033,24 @@ function VentasModule({cal}){
 
   // Reload gastos when month changes
   const prevMonthRef = React.useRef(null);
-  useEffect(()=>{ setGastos(loadGastos(year,month)); },[year,month]);
+  useEffect(()=>{
+    let mounted=true;
+    const init=async()=>{
+      const data=await loadGastosRemote(year,month);
+      if(mounted) setGastos(data);
+      // Subscribe to real-time gastos changes
+      if(window.__firebase?.onGastosChange){
+        return window.__firebase.onGastosChange(year,month,(remote)=>{
+          if(mounted){
+            setGastos(remote);
+            try{localStorage.setItem(`${GASTOS_KEY}-${year}-${month}`,JSON.stringify(remote));}catch(e){}
+          }
+        });
+      }
+    };
+    const unsub=init();
+    return()=>{ mounted=false; if(unsub&&typeof unsub==="function") unsub(); };
+  },[year,month]);
 
   const GASTO_CATS = [
     {id:"material",  label:"Material",          emoji:"🧴", color:"#3b82f6"},
