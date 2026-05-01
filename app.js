@@ -1029,56 +1029,214 @@ function VentasModule({cal}){
   const originCount={};calServices.forEach(s=>{if(s.origin)originCount[s.origin]=(originCount[s.origin]||0)+1;});
 
   const generatePDF=()=>{
-    const originBlocks=ORIGINS.map(o=>{
+    const win=window.open("","_blank");
+    const rows=calServices.map(s=>{
+      const orig=ORIGINS.find(o=>o.id===s.origin);
+      return `<tr><td>${s.day}</td><td>${s.serviceNorm||s.service||"—"}</td><td>${s.vehicle||"—"}</td><td>${s.client||"—"}</td><td>${orig?orig.label:"—"}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${s.price?fmt(parseFloat(s.price)):"—"}</td></tr>`;
+    }).join("");
+    const originRows=ORIGINS.map(o=>{
       const svcs=calServices.filter(s=>s.origin===o.id);
       if(!svcs.length) return "";
       const total=svcs.reduce((a,s)=>a+(parseFloat(s.price)||0),0);
-      // Count each service type for compact summary
-      const svcCount={};svcs.forEach(s=>{const k=s.serviceNorm||s.service||"Otro";svcCount[k]=(svcCount[k]||0)+1;});
-      const svcSummary=Object.entries(svcCount).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`${c}x ${n.replace(/—/g,"-").replace("Artdeshine Premium","ADS")}`).join(", ");
-      const items=svcs.map(s=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-top:1px solid #2a2a2a;font-size:11px"><span style="color:#aaa">D${s.day} &middot; ${(s.serviceNorm||s.service||"").replace(/—/g,"-").replace("Artdeshine Premium","ADS")} &middot; ${s.vehicle||""}</span><span style="color:#d0d0d0;font-weight:600;flex-shrink:0;margin-left:8px">${s.price?fmt(parseFloat(s.price)):""}</span></div>`).join("");
-      return JSON.stringify({total,html:`<div style="background:#1c1c1c;border:1px solid ${o.color}55;border-radius:10px;padding:12px 14px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">${o.emoji}</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:${o.color}">${o.label}</span></div><span style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:${o.color}">${fmt(total)}</span></div><div style="font-size:10px;color:#909090;margin-bottom:8px">${svcSummary}</div>${items}</div>`});
-    }).filter(Boolean).map(s=>JSON.parse(s)).sort((a,b)=>b.total-a.total).map(o=>o.html).join("");
-    const noOrig=calServices.filter(s=>!s.origin);
-    const noOrigBlock=noOrig.length?`<div style="background:#1c1c1c;border:1px solid #333;border-radius:10px;padding:12px 14px;margin-bottom:8px"><div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:14px;color:#909090;font-weight:600">Sin origen</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;color:#909090;font-weight:700">${fmt(noOrig.reduce((a,s)=>a+(parseFloat(s.price)||0),0))}</span></div>${noOrig.map(s=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-top:1px solid #2a2a2a;font-size:11px"><span style="color:#aaa">D${s.day} &middot; ${(s.serviceNorm||s.service||"").replace(/—/g,"-")}</span><span style="color:#d0d0d0;font-weight:600">${s.price?fmt(parseFloat(s.price)):""}</span></div>`).join("")}</div>`:"";
-    const detailCards=calServices.map(s=>{const stObj=SERVICE_STATUSES.find(st=>st.id===s.status);const origObj=ORIGINS.find(o=>o.id===s.origin);return`<div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center"><div style="flex:1"><div style="font-size:9px;color:#909090;margin-bottom:2px">Día ${s.day}${s.client?" &middot; "+s.client:""}${origObj?" &middot; "+origObj.emoji+origObj.label:""}</div><div style="font-size:13px;font-weight:700;color:#fff">${(s.serviceNorm||s.service||"—").replace(/—/g,"-")}</div>${s.vehicle?`<div style="font-size:10px;color:#7dd3fc;margin-top:1px">${s.vehicle}</div>`:""} ${stObj?`<div style="font-size:9px;color:${stObj.color};font-weight:700;margin-top:2px">${stObj.emoji} ${stObj.label}</div>`:""}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;color:${s.price?"#c9a84c":"#909090"};flex-shrink:0;margin-left:12px">${s.price?fmt(parseFloat(s.price)):"—"}</div></div>`;}).join("");
-    const topSvcs=[...Object.entries(calServices.reduce((acc,s)=>{const k=s.serviceNorm||s.service||"Otro";acc[k]=(acc[k]||0)+1;return acc;},{}))].sort((a,b)=>b[1]-a[1]).slice(0,5);
-    const topSvcRows=topSvcs.map(([n,c],i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #2a2a2a"><span style="font-size:12px;color:#d0d0d0">${n.replace(/—/g,"-")}</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:#c9a84c">${c}x</span></div>`).join("");
-    const maxW=Math.max(...weeks,1);
-    const barChart=weeks.map((w,i)=>{const pct=maxW>0?Math.round((w/maxW)*100):0;const isMax=w===maxW&&w>0;return`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px"><div style="font-size:9px;color:${isMax?"#e0bb6e":"#c9a84c"};font-weight:700;text-align:center">${w>0?(w>=1000?(w/1000).toFixed(1)+"k":"$"+w):""}</div><div style="width:100%;display:flex;align-items:flex-end;height:60px"><div style="width:100%;background:${isMax?"linear-gradient(180deg,#ffe08a,#c9a84c)":w>0?"linear-gradient(180deg,#c9a84c,#8a6f2e)":"#1e1e1e"};height:${Math.max(pct,w>0?8:2)}%;border-radius:4px 4px 0 0;min-height:${w>0?4:1}px"></div></div><div style="font-size:9px;color:${isMax?"#c9a84c":"#666"}">S${i+1}</div></div>`;}).join("");
-    const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reporte ${MONTHS[month-1]} ${year}</title><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:8mm;size:Letter}html,body{background:#0e0e0e;color:#d0d0d0;font-family:'Barlow',sans-serif}.no-print{position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,.96);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;z-index:999;border-bottom:1px solid #333}.content{padding:54px 16px 24px}@media print{.no-print{display:none!important}.content{padding:8px}}</style></head><body>
-    <div class="no-print"><span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:3px;color:#c9a84c">ALPHA DETAILING</span><div style="display:flex;gap:8px"><button onclick="window.print()" style="background:#c9a84c;border:none;border-radius:6px;color:#000;padding:7px 14px;font-weight:700;font-size:12px;cursor:pointer;font-family:'Barlow',sans-serif">🖨 Imprimir</button><button onclick="history.back()" style="background:#222;border:1px solid #333;border-radius:6px;color:#fff;padding:7px 14px;font-weight:600;font-size:12px;cursor:pointer;font-family:'Barlow',sans-serif">← Volver</button></div></div>
-    <div class="content">
-      <div style="text-align:center;background:#111;padding:16px;border-radius:12px;margin-bottom:14px">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:36px;font-weight:800;letter-spacing:8px;color:#fff;line-height:1">ALPHA <span style="color:#c9a84c">DETAILING</span></div>
-        <div style="font-size:8px;letter-spacing:4px;color:#666;text-transform:uppercase;margin-top:3px">Reporte de ventas</div>
-        <div style="display:inline-block;background:#c9a84c;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;padding:4px 14px;margin-top:10px">${MONTHS[month-1].toUpperCase()} ${year}</div>
+      const svcNames=[...new Set(svcs.map(s=>s.serviceNorm||s.service))].slice(0,3).join(", ");
+      return `<tr><td>${o.emoji} ${o.label}</td><td style="text-align:center">${svcs.length}</td><td style="font-size:10px">${svcNames}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(total)}</td></tr>`;
+    }).filter(Boolean).join("");
+    const noOrigin=calServices.filter(s=>!s.origin);
+    const noOriginRow=noOrigin.length?`<tr><td>— Sin origen</td><td style="text-align:center">${noOrigin.length}</td><td style="font-size:10px">${[...new Set(noOrigin.map(s=>s.serviceNorm||s.service))].slice(0,3).join(", ")}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(noOrigin.reduce((a,s)=>a+(parseFloat(s.price)||0),0))}</td></tr>`:"";
+
+    win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>Reporte ${MONTHS[month-1]} ${year} — Alpha Detailing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      @page{margin:0;size:Letter}
+      html,body{width:100%;height:100%;background:#1a1a1a}
+      body{font-family:'Barlow','Helvetica Neue',sans-serif;color:#d0d0d0;padding:20px 24px}
+      .header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid #333}
+      .brand{font-family:'Barlow Condensed',sans-serif;font-size:38px;font-weight:800;letter-spacing:8px;color:#fff;line-height:1}
+      .brand span{color:#c9a84c}
+      .brand-sub{font-size:9px;letter-spacing:5px;color:#666;text-transform:uppercase;margin-top:4px}
+      .badge{background:#c9a84c;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;padding:5px 14px;display:inline-block;margin-bottom:8px}
+      .meta{font-size:11px;color:#888;text-align:right;line-height:1.9}
+      .meta span{color:#d0d0d0}
+      .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+      .kpi{background:#222;border:1px solid #333;border-radius:8px;padding:10px 8px;text-align:center}
+      .kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700;color:#c9a84c;line-height:1}
+      .kpi-lbl{font-size:8px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+      .sec{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin:14px 0 7px;padding-bottom:6px;border-bottom:1px solid #333}
+      table{width:100%;border-collapse:collapse;font-size:11px}
+      th{background:#222;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;font-size:8px;padding:7px 10px;text-align:left;border-bottom:1px solid #333}
+      td{padding:7px 10px;border-bottom:1px solid #252525;color:#d0d0d0;vertical-align:middle}
+      tr:nth-child(even) td{background:#1e1e1e}
+      .total-row td{background:#252525;font-weight:700;color:#fff;border-top:2px solid #c9a84c;font-size:12px}
+      .footer{margin-top:16px;display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #333}
+      .footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:4px;color:#fff}
+      .footer-brand span{color:#c9a84c}
+      .footer-note{font-style:italic;font-size:10px;color:#666}
+    </style></head><body>
+    <div class="header">
+      <div>
+        <div class="brand">ALPHA <span>DETAILING</span></div>
+        <div class="brand-sub">Reporte de ventas</div>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">
-        <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:12px 10px;text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#c9a84c">${fmt(calTotal)}</div><div style="font-size:8px;color:#909090;text-transform:uppercase;letter-spacing:1px;margin-top:3px">Total</div></div>
-        <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:12px 10px;text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#c9a84c">${calServices.length}</div><div style="font-size:8px;color:#909090;text-transform:uppercase;letter-spacing:1px;margin-top:3px">Servicios</div></div>
-        <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:12px 10px;text-align:center"><div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#c9a84c">${fmt(ticketProm)}</div><div style="font-size:8px;color:#909090;text-transform:uppercase;letter-spacing:1px;margin-top:3px">Ticket prom.</div></div>
+      <div style="text-align:right">
+        <div class="badge">${MONTHS[month-1].toUpperCase()} ${year}</div>
+        <div class="meta">Generado <span>${new Date().toLocaleDateString("es-MX")}</span></div>
+        ${pctChange!==null?`<div class="meta">vs ${MONTHS_SHORT[prevM-1]} <span style="color:${pctChange>=0?"#22c55e":"#ef4444"}">${pctChange>=0?"↑":"↓"}${Math.abs(pctChange)}%</span></div>`:""}
       </div>
-      <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:14px;margin-bottom:14px">
-        <div style="font-size:9px;color:#909090;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">Ingresos por semana</div>
-        <div style="display:flex;gap:8px;align-items:flex-end;height:80px">${barChart}</div>
-        <div style="display:flex;justify-content:space-between;margin-top:8px;padding-top:8px;border-top:1px solid #2a2a2a"><span style="font-size:10px;color:#909090">Mejor semana: S${weeks.indexOf(maxWeek)+1}</span><span style="font-size:10px;color:#c9a84c;font-weight:700">${fmt(maxWeek)}</span></div>
-      </div>
-      <div style="font-size:9px;color:#c9a84c;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #333">Por origen de cliente</div>
-      ${originBlocks}${noOrigBlock}
-      <div style="font-size:9px;color:#c9a84c;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid #333">Servicios más vendidos</div>
-      <div style="background:#1c1c1c;border:1px solid #2a2a2a;border-radius:10px;padding:12px 14px;margin-bottom:14px">${topSvcRows}</div>
-      <div style="font-size:9px;color:#c9a84c;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #333">Detalle de servicios</div>
-      ${detailCards}
-      <div style="display:flex;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid #333">
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;letter-spacing:4px;color:#fff">ALPHA <span style="color:#c9a84c">DETAILING</span></div>
-        <div style="font-style:italic;font-size:10px;color:#666">Reporte interno confidencial</div>
-      </div>
-    </div></body></html>`;
-    const blob=new Blob([html],{type:"text/html"});
-    const url=URL.createObjectURL(blob);
-    window.location.href=url;
+    </div>
+    <div class="kpis">
+      <div class="kpi"><div class="kpi-val">${fmt(calTotal)}</div><div class="kpi-lbl">Total del mes</div></div>
+      <div class="kpi"><div class="kpi-val">${calServices.length}</div><div class="kpi-lbl">Servicios</div></div>
+      <div class="kpi"><div class="kpi-val">${fmt(ticketProm)}</div><div class="kpi-lbl">Ticket promedio</div></div>
+      <div class="kpi"><div class="kpi-val">${calServices.filter(s=>s.status==="paid").length}</div><div class="kpi-lbl">Cobrados</div></div>
+    </div>
+    <div class="sec">Origen de clientes</div>
+    <table><thead><tr><th>Origen</th><th style="text-align:center">Cantidad</th><th>Servicios</th><th style="text-align:right">Total</th></tr></thead>
+    <tbody>${originRows}${noOriginRow}
+    <tr class="total-row"><td colspan="3">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr>
+    </tbody></table>
+    <div class="sec">Detalle de servicios</div>
+    <table><thead><tr><th>Día</th><th>Servicio</th><th>Vehículo</th><th>Cliente</th><th>Origen</th><th style="text-align:right">Monto</th></tr></thead>
+    <tbody>${rows}
+    <tr class="total-row"><td colspan="5">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr>
+    </tbody></table>
+    <div class="footer">
+      <div class="footer-brand">ALPHA <span>DETAILING</span></div>
+      <div class="footer-note">Reporte interno — confidencial</div>
+    </div>
+    </body></html>`);
+    win.document.close();
+    // Close button overlay so user can go back
+    const closeBar=win.document.createElement("div");
+    closeBar.style.cssText="position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,.9);padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:999;font-family:sans-serif";
+    closeBar.innerHTML='<span style="color:#c9a84c;font-size:12px;font-weight:700;letter-spacing:2px">ALPHA DETAILING — REPORTE</span><button onclick="window.close()" style="background:#c9a84c;border:none;border-radius:6px;color:#000;padding:6px 14px;font-weight:700;font-size:12px;cursor:pointer">✕ Cerrar</button>';
+    win.document.body.appendChild(closeBar);
+    win.document.body.style.paddingTop="44px";
+    setTimeout(()=>win.print(),600);
   };
+
+  return React.createElement("div",{style:{padding:"16px 14px calc(60px + env(safe-area-inset-bottom,0px))",maxWidth:520,margin:"0 auto"}},
+    React.createElement("div",{style:{display:"flex",alignItems:"center",justifyContent:"center",gap:12,marginBottom:4,marginTop:8}},
+      React.createElement("button",{className:"nav-btn",onClick:prevMonth},"‹"),
+      React.createElement("div",{className:"month-title",style:{fontSize:"clamp(24px,7vw,42px)",minWidth:180}},`${MONTHS[month-1]} ${year}`),
+      React.createElement("button",{className:"nav-btn",onClick:nextMonth},"›")
+    ),
+    React.createElement("p",{style:{textAlign:"center",fontSize:9,letterSpacing:3,color:"#909090",textTransform:"uppercase",marginBottom:12}},"Control de ventas"),
+    // Goal banner
+    React.createElement("div",{style:{maxWidth:520,margin:"0 auto 16px",background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:12,padding:"12px 16px"}},
+      showGoalEdit
+        ? React.createElement("div",{style:{display:"flex",gap:8,alignItems:"center"}},
+            React.createElement("span",{style:{fontSize:12,color:"#909090",flexShrink:0}},"Meta $"),
+            React.createElement("input",{className:"inp",type:"number",value:goalInput,placeholder:"Ej. 150000",style:{flex:1},onChange:e=>setGoalInput(e.target.value)}),
+            React.createElement("button",{onClick:()=>{saveGoal(year,month,parseFloat(goalInput)||0);setShowGoalEdit(false);},style:{padding:"8px 14px",background:"#c9a84c",border:"none",borderRadius:8,color:"#000",fontWeight:700,fontSize:12,cursor:"pointer",flexShrink:0}},"✓"),
+            React.createElement("button",{onClick:()=>setShowGoalEdit(false),style:{padding:"8px 10px",background:"transparent",border:"1px solid #333",borderRadius:8,color:"#888",fontSize:12,cursor:"pointer",flexShrink:0}},"✕")
+          )
+        : React.createElement("div",null,
+            React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:currentGoal>0?8:0}},
+              React.createElement("div",{style:{fontSize:10,color:"#909090",letterSpacing:2,textTransform:"uppercase"}},currentGoal>0?"Meta del mes":"Sin meta definida"),
+              React.createElement("button",{onClick:()=>{setGoalInput(String(currentGoal||""));setShowGoalEdit(true);},style:{fontSize:11,color:"#c9a84c",background:"none",border:"none",cursor:"pointer",padding:0}},currentGoal>0?"✏️ Editar":"+ Fijar meta")
+            ),
+            currentGoal>0&&React.createElement("div",null,
+              React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:6}},
+                React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:calTotal>=currentGoal?"#22c55e":"#c9a84c"}},fmt(calTotal)),
+                React.createElement("span",{style:{fontSize:12,color:"#909090"}},`de ${fmt(currentGoal)}`)
+              ),
+              React.createElement("div",{style:{height:8,background:"#2a2a2a",borderRadius:4,overflow:"hidden"}},
+                React.createElement("div",{style:{height:"100%",width:`${Math.min((calTotal/currentGoal)*100,100)}%`,background:calTotal>=currentGoal?"linear-gradient(90deg,#22c55e,#16a34a)":"linear-gradient(90deg,#c9a84c,#e0bb6e)",borderRadius:4,transition:"width .5s"}})
+              ),
+              React.createElement("div",{style:{fontSize:10,color:"#909090",marginTop:5,textAlign:"right"}},
+                calTotal>=currentGoal
+                  ? "🎉 ¡Meta alcanzada!"
+                  : `Faltan ${fmt(currentGoal-calTotal)} · ${Math.round((calTotal/currentGoal)*100)}%`
+              )
+            )
+          )
+    ),
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:18}},
+      React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",gridColumn:"1/-1"}},
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center"}},
+          React.createElement("div",null,React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:4}},"Total del mes"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:32,fontWeight:700,color:"#c9a84c"}},fmt(calTotal))),
+          pctChange!==null&&React.createElement("div",{style:{textAlign:"right"}},React.createElement("div",{style:{fontSize:20,fontWeight:700,color:pctChange>=0?"#22c55e":"#ef4444"}},(pctChange>=0?"↑":"↓")+Math.abs(pctChange)+"%"),React.createElement("div",{style:{fontSize:10,color:"#909090"}},`vs ${MONTHS_SHORT[prevM-1]}`))
+        )
+      ),
+      React.createElement("div",{className:"stat-card",style:{padding:"12px"}},React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:1,textTransform:"uppercase",marginBottom:4}},"Servicios"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:700,color:"#c9a84c"}},calServices.length)),
+      React.createElement("div",{className:"stat-card",style:{padding:"12px"}},React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:1,textTransform:"uppercase",marginBottom:4}},"Ticket promedio"),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:26,fontWeight:700,color:"#c9a84c"}},fmt(ticketProm)))
+    ),
+    calTotal>0&&React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",marginBottom:14}},
+      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:14}},"Ingresos por semana"),
+      React.createElement("div",{style:{display:"flex",gap:8,alignItems:"flex-end",height:100}},
+        weeks.map((w,i)=>{
+          const pct=maxWeek>0?Math.max((w/maxWeek)*100,w>0?8:2):2;
+          const isMax=w===maxWeek&&w>0;
+          return React.createElement("div",{key:i,style:{flex:1,display:"flex",flexDirection:"column",alignItems:"center",gap:5}},
+            w>0&&React.createElement("div",{style:{fontSize:10,color:isMax?"#e0bb6e":"#c9a84c",fontWeight:700,textAlign:"center"}},
+              w>=1000?(w/1000).toFixed(1)+"k":"$"+w
+            ),
+            React.createElement("div",{style:{
+              width:"100%",
+              height:`${pct}%`,
+              background:isMax?"linear-gradient(180deg,#ffe08a,#c9a84c)":w>0?"linear-gradient(180deg,#c9a84c,#8a6f2e)":"#1e1e1e",
+              borderRadius:"6px 6px 0 0",
+              minHeight:w>0?8:2,
+              border:isMax?"1px solid rgba(224,187,110,.4)":"none",
+              boxShadow:isMax?"0 0 12px rgba(201,168,76,.3)":"none",
+              transition:"height .3s"
+            }}),
+            React.createElement("div",{style:{fontSize:8,color:isMax?"#c9a84c":"#909090",fontWeight:isMax?700:400}},`S${i+1}`)
+          );
+        })
+      ),
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginTop:8,paddingTop:8,borderTop:"1px solid #2a2a2a"}},
+        React.createElement("span",{style:{fontSize:10,color:"#909090"}},"Mejor semana: S"+(weeks.indexOf(maxWeek)+1)),
+        React.createElement("span",{style:{fontSize:10,color:"#c9a84c",fontWeight:700}},fmt(maxWeek))
+      )
+    ),
+    // Origins breakdown
+    Object.keys(originCount).length>0&&React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",marginBottom:14}},
+      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:12}},"Origen de clientes"),
+      React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+        ORIGINS.map(o=>{
+          const count=originCount[o.id]||0;if(!count)return null;
+          const pct=Math.round((count/calServices.length)*100);
+          return React.createElement("div",{key:o.id,style:{display:"flex",alignItems:"center",gap:10}},
+            React.createElement("span",{style:{fontSize:14,minWidth:22}},o.emoji),
+            React.createElement("div",{style:{flex:1}},
+              React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:4}},React.createElement("span",{style:{fontSize:12,color:"#d0d0d0",fontWeight:600}},o.label),React.createElement("span",{style:{fontSize:12,color:o.color,fontWeight:700}},`${count} · ${pct}%`)),
+              React.createElement("div",{style:{height:5,background:"#2a2a2a",borderRadius:3,overflow:"hidden"}},React.createElement("div",{style:{height:"100%",width:pct+"%",background:o.color,borderRadius:3}}))
+            )
+          );
+        }),
+        calServices.filter(s=>!s.origin).length>0&&React.createElement("div",{style:{display:"flex",alignItems:"center",gap:10}},
+          React.createElement("span",{style:{fontSize:14,minWidth:22}},"—"),
+          React.createElement("div",{style:{flex:1,display:"flex",justifyContent:"space-between"}},React.createElement("span",{style:{fontSize:12,color:"#909090"}},"Sin origen"),React.createElement("span",{style:{fontSize:12,color:"#909090",fontWeight:700}},calServices.filter(s=>!s.origin).length))
+        )
+      )
+    ),
+    topSvc.length>0&&React.createElement("div",{className:"stat-card",style:{padding:"14px 12px",marginBottom:14}},
+      React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:10}},"Servicios más vendidos"),
+      topSvc.map(([name,count],i)=>React.createElement("div",{key:i,style:{display:"flex",justifyContent:"space-between",padding:"6px 0",borderBottom:i<topSvc.length-1?"1px solid #222":"none"}},React.createElement("div",{style:{fontSize:12,color:"#d0d0d0",flex:1,paddingRight:8}},name),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:14,fontWeight:700,color:"#c9a84c"}},count,"x")))
+    ),
+    calServices.length>0&&React.createElement("div",null,
+      React.createElement("div",{className:"sec-label",style:{marginTop:0}},"Detalle de servicios"),
+      React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:8}},
+        calServices.map((s,i)=>{const stObj=SERVICE_STATUSES.find(st=>st.id===s.status);return React.createElement("div",{key:i,style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,padding:"12px 14px",display:"flex",justifyContent:"space-between",alignItems:"center"}},React.createElement("div",null,React.createElement("div",{style:{fontSize:11,color:"#909090",marginBottom:3}},`Día ${s.day}${s.client?" · "+s.client:""}`),React.createElement("div",{style:{fontSize:13,fontWeight:600,color:"#d0d0d0"}},s.serviceNorm||s.service||"Servicio"),s.vehicle&&React.createElement("div",{style:{fontSize:11,color:"#7dd3fc",marginTop:2}},s.vehicle),stObj&&React.createElement("div",{style:{fontSize:10,color:stObj.color,marginTop:3,fontWeight:700}},`${stObj.emoji} ${stObj.label}`)),React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:s.price?"#c9a84c":"#909090",flexShrink:0}},s.price?fmt(parseFloat(s.price)):"—"));})
+      )
+    ),
+    calServices.length===0&&React.createElement("div",{style:{textAlign:"center",padding:"40px 0",color:"#909090"}},React.createElement("div",{style:{fontSize:32,marginBottom:12}},"📊"),React.createElement("div",{style:{fontSize:14}},"Sin datos este mes")),
+    calServices.length>0&&React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:16}},
+      React.createElement("button",{onClick:()=>setShowReport(true),style:{padding:"13px",background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:10,color:"#d0d0d0",fontFamily:"'Barlow',sans-serif",fontSize:13,fontWeight:600,cursor:"pointer"}},"📊 Ver reporte"),
+      React.createElement("button",{onClick:()=>{
+        // Build PDF HTML
+        const rows=calServices.map(s=>{const orig=ORIGINS.find(o=>o.id===s.origin);return `<tr><td>${s.day}</td><td>${s.serviceNorm||s.service||"—"}</td><td>${s.vehicle||"—"}</td><td>${s.client||"—"}</td><td>${orig?orig.label:"—"}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${s.price?fmt(parseFloat(s.price)):"—"}</td></tr>`;}).join("");
+        const originRows=ORIGINS.map(o=>{const svcs=calServices.filter(s=>s.origin===o.id);if(!svcs.length)return null;const total=svcs.reduce((a,s)=>a+(parseFloat(s.price)||0),0);const sc={};svcs.forEach(s=>{const k=(s.serviceNorm||s.service||"Otro").replace("Artdeshine Premium","ADS");sc[k]=(sc[k]||0)+1;});const summary=Object.entries(sc).sort((a,b)=>b[1]-a[1]).map(([n,c])=>`${c}x ${n.replace(/—/g,"-")}`).join(", ");return{total,html:`<tr><td>${o.emoji} ${o.label}</td><td style="text-align:center">${svcs.length}</td><td style="font-size:10px">${summary}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(total)}</td></tr>`};}).filter(Boolean).sort((a,b)=>b.total-a.total).map(o=>o.html).join("");
+        const noOrigin=calServices.filter(s=>!s.origin);
+        const noRow=noOrigin.length?`<tr><td>— Sin origen</td><td style="text-align:center">${noOrigin.length}</td><td style="font-size:10px">${[...new Set(noOrigin.map(s=>s.serviceNorm||s.service))].slice(0,3).join(", ")}</td><td style="text-align:right;color:#c9a84c;font-weight:700">${fmt(noOrigin.reduce((a,s)=>a+(parseFloat(s.price)||0),0))}</td></tr>`:"";
+        const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Reporte ${MONTHS[month-1]} ${year}</title><link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@700;800&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}@page{margin:12mm;size:Letter}body{font-family:'Barlow',sans-serif;background:#1a1a1a;color:#d0d0d0;padding:20px 22px}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #333}.brand{font-family:'Barlow Condensed',sans-serif;font-size:34px;font-weight:800;letter-spacing:7px;color:#fff;line-height:1}.brand span{color:#c9a84c}.brand-sub{font-size:8px;letter-spacing:4px;color:#666;text-transform:uppercase;margin-top:3px}.badge{background:#c9a84c;color:#000;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;padding:4px 12px;display:inline-block;margin-bottom:6px}.meta{font-size:10px;color:#888;text-align:right;line-height:1.9}.meta span{color:#d0d0d0}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}.kpi{background:#222;border:1px solid #333;border-radius:7px;padding:9px 7px;text-align:center}.kpi-val{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:700;color:#c9a84c;line-height:1}.kpi-lbl{font-size:7px;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:3px}.sec{font-size:8px;letter-spacing:3px;text-transform:uppercase;color:#c9a84c;font-weight:700;margin:12px 0 6px;padding-bottom:5px;border-bottom:1px solid #333}table{width:100%;border-collapse:collapse;font-size:10px}th{background:#222;color:#c9a84c;text-transform:uppercase;letter-spacing:.5px;font-size:7.5px;padding:6px 8px;text-align:left;border-bottom:1px solid #333}td{padding:6px 8px;border-bottom:1px solid #252525;color:#d0d0d0;vertical-align:middle}tr:nth-child(even) td{background:#1e1e1e}.total-row td{background:#252525;font-weight:700;color:#fff;border-top:2px solid #c9a84c;font-size:11px}.footer{margin-top:14px;display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid #333}.footer-brand{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:4px;color:#fff}.footer-brand span{color:#c9a84c}.footer-note{font-style:italic;font-size:9px;color:#666}@media print{.no-print{display:none!important}}</style></head><body><div class="no-print" style="position:fixed;top:0;left:0;right:0;background:#111;padding:8px 16px;display:flex;justify-content:space-between;align-items:center;z-index:999;border-bottom:1px solid #333"><span style="color:#c9a84c;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px">ALPHA DETAILING</span><div style="display:flex;gap:8px"><button onclick="window.print()" style="background:#c9a84c;border:none;border-radius:6px;color:#000;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer">🖨 Imprimir</button><button onclick="history.back()" style="background:#333;border:none;border-radius:6px;color:#fff;padding:6px 12px;font-weight:700;font-size:11px;cursor:pointer">← Volver</button></div></div><div style="margin-top:44px"><div class="header"><div><div class="brand">ALPHA <span>DETAILING</span></div><div class="brand-sub">Reporte de ventas</div></div><div><div class="badge">${MONTHS[month-1].toUpperCase()} ${year}</div><div class="meta">Generado <span>${new Date().toLocaleDateString("es-MX")}</span></div></div></div><div class="kpis"><div class="kpi"><div class="kpi-val">${fmt(calTotal)}</div><div class="kpi-lbl">Total del mes</div></div><div class="kpi"><div class="kpi-val">${calServices.length}</div><div class="kpi-lbl">Servicios</div></div><div class="kpi"><div class="kpi-val">${fmt(ticketProm)}</div><div class="kpi-lbl">Ticket promedio</div></div><div class="kpi"><div class="kpi-val">${calServices.filter(s=>s.status==="paid").length}</div><div class="kpi-lbl">Cobrados</div></div></div><div class="sec">Origen de clientes</div><table><thead><tr><th>Origen</th><th>Cant.</th><th>Servicios</th><th style="text-align:right">Total</th></tr></thead><tbody>${originRows}${noRow}<tr class="total-row"><td colspan="3">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table><div class="sec">Detalle de servicios</div><table><thead><tr><th>Día</th><th>Servicio</th><th>Vehículo</th><th>Cliente</th><th>Origen</th><th style="text-align:right">Monto</th></tr></thead><tbody>${rows}<tr class="total-row"><td colspan="5">TOTAL</td><td style="text-align:right;color:#c9a84c">${fmt(calTotal)}</td></tr></tbody></table><div class="footer"><div class="footer-brand">ALPHA <span>DETAILING</span></div><div class="footer-note">Reporte interno confidencial</div></div></div></body></html>`;
+        // Use data URI to avoid popup blocker + allow back navigation
+        const blob=new Blob([html],{type:"text/html"});
+        const url=URL.createObjectURL(blob);
+        window.location.href=url;
       },style:{padding:"13px",background:"#1c1c1c",border:"1px solid #c9a84c",borderRadius:10,color:"#c9a84c",fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,letterSpacing:1,textTransform:"uppercase",cursor:"pointer"}},"📄 PDF")
     ),
     // Full report overlay with back button
