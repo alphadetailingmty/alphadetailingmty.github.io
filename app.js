@@ -35,6 +35,14 @@ const DEFAULT_CATALOG = [
 
 const CATALOG_KEY  = "alpha-catalog-v1";
 const CAL_KEY      = "alpha-cal-v4";
+const GASTOS_KEY   = "alpha-gastos-v1";
+
+function loadGastos(year, month) {
+  try { const r=localStorage.getItem(`${GASTOS_KEY}-${year}-${month}`); return r?JSON.parse(r):[]; } catch(e) { return []; }
+}
+function saveGastos(year, month, data) {
+  try { localStorage.setItem(`${GASTOS_KEY}-${year}-${month}`, JSON.stringify(data)); } catch(e) {}
+}
 const QUOTE_KEY    = "alpha-quotes-v2";
 const QNUM_KEY     = "alpha-quote-num";
 const CLIENTS_KEY  = "alpha-clients-v1";
@@ -1004,6 +1012,35 @@ function VentasModule({cal}){
   const[year,setYear]=useState(today.getFullYear());
   const[month,setMonth]=useState(today.getMonth()+1);
   const[showReport,setShowReport]=useState(false);
+  const[ventasTab,setVentasTab]=useState("resumen"); // resumen | gastos
+  const[gastos,setGastos]=useState(()=>loadGastos(today.getFullYear(),today.getMonth()+1));
+  const[showAddGasto,setShowAddGasto]=useState(false);
+  const[gastoForm,setGastoForm]=useState({categoria:"material",descripcion:"",monto:""});
+
+  // Reload gastos when month changes
+  const prevMonthRef = React.useRef(null);
+  useEffect(()=>{ setGastos(loadGastos(year,month)); },[year,month]);
+
+  const GASTO_CATS = [
+    {id:"material",  label:"Material",          emoji:"🧴", color:"#3b82f6"},
+    {id:"gasolina",  label:"Gasolina",           emoji:"⛽", color:"#f59e0b"},
+    {id:"auto",      label:"Mantenimiento auto",  emoji:"🚗", color:"#8b5cf6"},
+    {id:"renta",     label:"Renta / local",       emoji:"🏢", color:"#ef4444"},
+    {id:"otro",      label:"Otro gasto",          emoji:"📦", color:"#909090"},
+  ];
+
+  const totalGastos = gastos.reduce((a,g)=>a+(parseFloat(g.monto)||0),0);
+  const addGasto = () => {
+    if(!gastoForm.monto) return;
+    const next = [...gastos, {...gastoForm, id:Date.now(), fecha:new Date().getDate()}];
+    setGastos(next); saveGastos(year,month,next);
+    setGastoForm({categoria:"material",descripcion:"",monto:""});
+    setShowAddGasto(false);
+  };
+  const removeGasto = id => {
+    const next = gastos.filter(g=>g.id!==id);
+    setGastos(next); saveGastos(year,month,next);
+  };
   const[goalInput,setGoalInput]=useState("");
   const[showGoalEdit,setShowGoalEdit]=useState(false);
   const GOAL_KEY="alpha-goal-v1";
@@ -1123,6 +1160,13 @@ function VentasModule({cal}){
       React.createElement("button",{className:"nav-btn",onClick:nextMonth},"›")
     ),
     React.createElement("p",{style:{textAlign:"center",fontSize:9,letterSpacing:3,color:"#909090",textTransform:"uppercase",marginBottom:12}},"Control de ventas"),
+    // Sub-tabs
+    React.createElement("div",{style:{display:"flex",gap:6,marginBottom:16,background:"#161616",border:"1px solid #2a2a2a",borderRadius:10,padding:4}},
+      [["resumen","📊 Resumen"],["gastos","💸 Gastos"]].map(([id,label])=>
+        React.createElement("button",{key:id,onClick:()=>setVentasTab(id),style:{flex:1,padding:"9px",border:"none",borderRadius:7,cursor:"pointer",fontFamily:"'Barlow',sans-serif",fontWeight:700,fontSize:12,transition:"all .2s",background:ventasTab===id?"linear-gradient(135deg,#c9a84c,#e0bb6e)":"transparent",color:ventasTab===id?"#000":"#909090"}},label)
+      )
+    ),
+    ventasTab==="resumen"&&React.createElement("div",null,
     // Goal banner
     React.createElement("div",{style:{maxWidth:520,margin:"0 auto 16px",background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:12,padding:"12px 16px"}},
       showGoalEdit
@@ -1239,6 +1283,84 @@ function VentasModule({cal}){
         window.location.href=url;
       },style:{padding:"13px",background:"#1c1c1c",border:"1px solid #c9a84c",borderRadius:10,color:"#c9a84c",fontFamily:"'Barlow Condensed',sans-serif",fontSize:13,fontWeight:700,letterSpacing:1,textTransform:"uppercase",cursor:"pointer"}},"📄 PDF")
     ),
+    ), // end ventasTab==="resumen"
+
+    // ── GASTOS TAB ──
+    ventasTab==="gastos"&&React.createElement("div",null,
+      // Utilidad summary card
+      React.createElement("div",{style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:12,padding:"16px",marginBottom:14}},
+        React.createElement("div",{style:{fontSize:9,color:"#909090",letterSpacing:2,textTransform:"uppercase",marginBottom:12}},"Resumen del mes"),
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,paddingBottom:8,borderBottom:"1px solid #2a2a2a"}},
+          React.createElement("span",{style:{fontSize:13,color:"#d0d0d0"}},"Ingresos"),
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:"#c9a84c"}},fmt(calTotal))
+        ),
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8,paddingBottom:8,borderBottom:"1px solid #2a2a2a"}},
+          React.createElement("span",{style:{fontSize:13,color:"#d0d0d0"}},"Gastos"),
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:"#ef4444"}},`− ${fmt(totalGastos)}`)
+        ),
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:4}},
+          React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:16,fontWeight:700,color:"#fff",letterSpacing:2}},"UTILIDAD"),
+          React.createElement("div",{style:{textAlign:"right"}},
+            React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:24,fontWeight:700,color:calTotal-totalGastos>=0?"#22c55e":"#ef4444"}},fmt(calTotal-totalGastos)),
+            calTotal>0&&React.createElement("div",{style:{fontSize:11,color:"#909090"}},`${Math.round(((calTotal-totalGastos)/calTotal)*100)}% de margen`)
+          )
+        )
+      ),
+
+      // Gastos by category
+      GASTO_CATS.map(cat=>{
+        const catGastos=gastos.filter(g=>g.categoria===cat.id);
+        const catTotal=catGastos.reduce((a,g)=>a+(parseFloat(g.monto)||0),0);
+        if(!catGastos.length) return null;
+        return React.createElement("div",{key:cat.id,style:{background:"#1c1c1c",border:`1px solid ${cat.color}33`,borderRadius:10,padding:"12px 14px",marginBottom:8}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:catGastos.length?8:0}},
+            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:7}},
+              React.createElement("span",{style:{fontSize:16}},cat.emoji),
+              React.createElement("span",{style:{fontSize:13,fontWeight:700,color:cat.color}},cat.label)
+            ),
+            React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:18,fontWeight:700,color:cat.color}},fmt(catTotal))
+          ),
+          catGastos.map(g=>React.createElement("div",{key:g.id,style:{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"6px 0",borderTop:"1px solid #2a2a2a"}},
+            React.createElement("div",null,
+              React.createElement("div",{style:{fontSize:12,color:"#d0d0d0"}},g.descripcion||cat.label),
+              React.createElement("div",{style:{fontSize:10,color:"#909090"}},`Día ${g.fecha}`)
+            ),
+            React.createElement("div",{style:{display:"flex",alignItems:"center",gap:8}},
+              React.createElement("span",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:15,fontWeight:600,color:"#ef4444"}},`− ${fmt(parseFloat(g.monto)||0)}`),
+              React.createElement("button",{onClick:()=>removeGasto(g.id),style:{background:"none",border:"none",color:"#909090",fontSize:14,cursor:"pointer",padding:"2px 4px"}},"×")
+            )
+          ))
+        );
+      }),
+
+      // Add gasto button
+      React.createElement("button",{onClick:()=>setShowAddGasto(true),style:{width:"100%",marginTop:8,padding:"12px",background:"transparent",border:"1px dashed #ef4444",borderRadius:10,color:"#ef4444",fontFamily:"'Barlow',sans-serif",fontWeight:600,fontSize:13,cursor:"pointer"}},"+ Agregar gasto"),
+
+      // Add gasto modal
+      showAddGasto&&React.createElement("div",{style:{position:"fixed",inset:0,background:"rgba(0,0,0,.85)",zIndex:300,display:"flex",alignItems:"flex-end",justifyContent:"center"},onClick:e=>e.target===e.currentTarget&&setShowAddGasto(false)},
+        React.createElement("div",{style:{background:"#1c1c1c",border:"1px solid #2a2a2a",borderRadius:"20px 20px 0 0",padding:"16px 18px calc(env(safe-area-inset-bottom,0px) + 40px)",width:"100%",maxWidth:480}},
+          React.createElement("div",{style:{width:36,height:4,background:"#333",borderRadius:2,margin:"0 auto 16px"}}),
+          React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:20,fontWeight:700,letterSpacing:2,color:"#ef4444",marginBottom:14}},"Agregar Gasto"),
+          // Category selector
+          React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6,marginBottom:14}},
+            GASTO_CATS.map(cat=>{
+              const active=gastoForm.categoria===cat.id;
+              return React.createElement("button",{key:cat.id,onClick:()=>setGastoForm(f=>({...f,categoria:cat.id})),style:{padding:"8px 4px",borderRadius:8,border:`1.5px solid ${active?cat.color:"#2a2a2a"}`,background:active?`${cat.color}18`:"transparent",color:active?cat.color:"#909090",fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:"'Barlow',sans-serif",lineHeight:1.4,textAlign:"center"}},`${cat.emoji}
+${cat.label}`);
+            })
+          ),
+          React.createElement("label",{style:{fontSize:10,letterSpacing:1.5,textTransform:"uppercase",color:"#909090",display:"block",marginBottom:5}},"Descripción (opcional)"),
+          React.createElement("input",{className:"inp",style:{marginBottom:10},value:gastoForm.descripcion,placeholder:"Ej. Artdeshine Hybrid+, Oberk...",onChange:e=>setGastoForm(f=>({...f,descripcion:e.target.value}))}),
+          React.createElement("label",{style:{fontSize:10,letterSpacing:1.5,textTransform:"uppercase",color:"#909090",display:"block",marginBottom:5}},"Monto"),
+          React.createElement("input",{className:"inp",type:"number",value:gastoForm.monto,placeholder:"0",onChange:e=>setGastoForm(f=>({...f,monto:e.target.value}))}),
+          React.createElement("div",{style:{display:"flex",gap:8,marginTop:16}},
+            React.createElement("button",{onClick:()=>setShowAddGasto(false),style:{flex:1,padding:13,borderRadius:10,border:"1px solid #2a2a2a",background:"transparent",color:"#d0d0d0",fontFamily:"'Barlow',sans-serif",fontWeight:600,fontSize:14,cursor:"pointer"}},"Cancelar"),
+            React.createElement("button",{onClick:addGasto,style:{flex:1,padding:13,borderRadius:10,border:"none",background:"#ef4444",color:"#fff",fontFamily:"'Barlow',sans-serif",fontWeight:700,fontSize:14,cursor:"pointer"}},"✓ Guardar")
+          )
+        )
+      )
+    ),
+
     // Full report overlay with back button
     showReport&&React.createElement("div",{style:{position:"fixed",inset:0,background:"#0e0e0e",zIndex:400,overflowY:"auto"}},
       React.createElement("div",{style:{position:"sticky",top:0,zIndex:10,background:"rgba(14,14,14,.95)",backdropFilter:"blur(8px)",padding:"calc(env(safe-area-inset-top,14px) + 10px) 16px 10px",display:"flex",alignItems:"center",gap:12,borderBottom:"1px solid #222"}},
