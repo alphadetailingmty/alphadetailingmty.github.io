@@ -183,10 +183,183 @@ function checkMaintReminders(){
 function Toast({toast}){if(!toast)return null;return React.createElement("div",{className:"toast",style:{background:toast.color||"#22c55e"}},toast.msg);}
 
 // ══════════════════════════════════════════════════════════════════════════════
+// DASHBOARD MODULE
+// ══════════════════════════════════════════════════════════════════════════════
+function DashboardModule({cal,setTab}){
+  const today=new Date();
+  const year=today.getFullYear(),month=today.getMonth()+1;
+  const GOAL_KEY="alpha-goal-v1";
+  const getGoal=()=>{try{const r=localStorage.getItem(GOAL_KEY);return r?JSON.parse(r):{};}catch(e){return{};}};
+  const saveGoal=(y,m,v)=>{try{const g=getGoal();g[`${y}-${m}`]=v;localStorage.setItem(GOAL_KEY,JSON.stringify(g));}catch(e){}};
+  const[goal,setGoal]=useState(()=>getGoal()[`${year}-${month}`]||80000);
+  const[editGoal,setEditGoal]=useState(false);
+  const[goalInput,setGoalInput]=useState("");
+
+  // Compute current month services
+  const calServicesThisMonth=[];
+  for(let d=1;d<=getDaysInMonth(year,month);d++){
+    const data=cal[`${year}-${month}-${d}`];
+    if(data?.type==="worked") calServicesThisMonth.push({day:d,...data});
+  }
+  const totalMes=calServicesThisMonth.reduce((acc,s)=>acc+(parseFloat(s.price)||0),0);
+  const serviciosMes=calServicesThisMonth.length;
+  const cobrados=calServicesThisMonth.filter(s=>s.status==="paid").length;
+  const ticketProm=serviciosMes>0?Math.round(totalMes/serviciosMes):0;
+
+  // Previous month
+  const prevY=month===1?year-1:year, prevM=month===1?12:month-1;
+  const prevTotal=(()=>{let t=0;for(let d=1;d<=getDaysInMonth(prevY,prevM);d++){const data=cal[`${prevY}-${prevM}-${d}`];if(data?.type==="worked")t+=(parseFloat(data.price)||0);}return t;})();
+  const pctChange=prevTotal>0?Math.round(((totalMes-prevTotal)/prevTotal)*100):null;
+
+  // Gastos
+  const gastos=loadGastos(year,month);
+  const totalGastos=gastos.reduce((acc,g)=>acc+(parseFloat(g.monto)||0),0);
+  const utilidad=totalMes-totalGastos;
+
+  // Top servicios
+  const svcCount={};
+  calServicesThisMonth.forEach(s=>{const k=normalizeServiceName(s.service)||"Otro";svcCount[k]=(svcCount[k]||0)+1;});
+  const topSvc=Object.entries(svcCount).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const maxSvc=topSvc[0]?topSvc[0][1]:1;
+
+  // Próximos servicios (upcoming days with "worked" type)
+  const upcoming=[];
+  for(let d=today.getDate()+1;d<=getDaysInMonth(year,month);d++){
+    const data=cal[`${year}-${month}-${d}`];
+    if(data?.type==="worked") upcoming.push({day:d,...data});
+    if(upcoming.length>=3) break;
+  }
+  // Also check next month
+  if(upcoming.length<3){
+    const nY=month===12?year+1:year, nM=month===12?1:month+1;
+    for(let d=1;d<=getDaysInMonth(nY,nM)&&upcoming.length<3;d++){
+      const data=cal[`${nY}-${nM}-${d}`];
+      if(data?.type==="worked") upcoming.push({day:d,month:nM,year:nY,...data});
+    }
+  }
+
+  const goalPct=goal>0?Math.min(100,Math.round((totalMes/goal)*100)):0;
+  const goalColor=goalPct>=100?"#22c55e":goalPct>=70?"#c9a84c":"#f59e0b";
+
+  return React.createElement("div",{style:{padding:"12px 14px 80px",maxWidth:520,margin:"0 auto"}},
+
+    // ── META DEL MES ──
+    React.createElement("div",{style:{background:"linear-gradient(135deg,#1a1400 0%,#1c1c1c 100%)",border:"1px solid #2a2200",borderRadius:16,padding:"18px 18px 16px",marginBottom:14,position:"relative",overflow:"hidden"}},
+      React.createElement("div",{style:{position:"absolute",top:0,right:0,width:120,height:120,background:"radial-gradient(circle at 100% 0%,rgba(201,168,76,.08) 0%,transparent 70%)",pointerEvents:"none"}}),
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:14}},
+        React.createElement("div",null,
+          React.createElement("div",{style:{fontSize:9,letterSpacing:3,color:"#c9a84c",textTransform:"uppercase",fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif"}},"Meta del mes"),
+          React.createElement("div",{style:{fontSize:28,fontWeight:800,color:"#fff",fontFamily:"'Barlow Condensed',sans-serif",lineHeight:1.1,marginTop:2}},fmt(totalMes)),
+          pctChange!==null&&React.createElement("div",{style:{fontSize:11,color:pctChange>=0?"#22c55e":"#ef4444",marginTop:3,fontWeight:600}},
+            pctChange>=0?"↑":"↓",` ${Math.abs(pctChange)}% vs ${MONTHS_SHORT[prevM-1]}`
+          )
+        ),
+        React.createElement("div",{style:{textAlign:"right"}},
+          React.createElement("div",{style:{fontSize:9,letterSpacing:2,color:"#888",textTransform:"uppercase",marginBottom:4}},"Objetivo"),
+          editGoal
+            ? React.createElement("div",{style:{display:"flex",gap:6,alignItems:"center"}},
+                React.createElement("input",{style:{width:90,padding:"4px 8px",background:"#2a2a2a",border:"1px solid #c9a84c",borderRadius:6,color:"#fff",fontSize:12,fontFamily:"'Barlow',sans-serif"},value:goalInput,placeholder:String(goal),autoFocus:true,onChange:e=>setGoalInput(e.target.value),onKeyDown:e=>{if(e.key==="Enter"||e.key==="Escape"){const v=parseFloat(goalInput);if(v>0){setGoal(v);saveGoal(year,month,v);}setEditGoal(false);}}}),
+                React.createElement("button",{style:{background:"#c9a84c",border:"none",borderRadius:5,color:"#000",fontSize:11,fontWeight:700,padding:"4px 8px",cursor:"pointer"},onClick:()=>{const v=parseFloat(goalInput);if(v>0){setGoal(v);saveGoal(year,month,v);}setEditGoal(false);}},"✓")
+              )
+            : React.createElement("div",{style:{fontSize:16,fontWeight:700,color:"#888",cursor:"pointer"},onClick:()=>{setGoalInput(String(goal));setEditGoal(true);}},
+                fmt(goal),React.createElement("span",{style:{fontSize:10,marginLeft:4,color:"#555"}},"✏")
+              )
+        )
+      ),
+      // Progress bar
+      React.createElement("div",{style:{marginBottom:6}},
+        React.createElement("div",{style:{height:6,background:"#2a2a2a",borderRadius:6,overflow:"hidden"}},
+          React.createElement("div",{style:{height:"100%",width:goalPct+"%",background:`linear-gradient(90deg,${goalColor},${goalColor}cc)`,borderRadius:6,transition:"width .8s ease"}})
+        ),
+        React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginTop:5}},
+          React.createElement("div",{style:{fontSize:10,color:goalColor,fontWeight:700}},goalPct+"%," +" completado"),
+          React.createElement("div",{style:{fontSize:10,color:"#555"}},goal-totalMes>0?`Faltan ${fmt(goal-totalMes)}`:"🏆 Meta alcanzada")
+        )
+      )
+    ),
+
+    // ── KPI CARDS ──
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:14}},
+      [
+        {label:"Servicios",value:serviciosMes,color:"#c9a84c",icon:"🚗",sub:cobrados+" cobrados"},
+        {label:"Ticket Promedio",value:fmt(ticketProm),color:"#3b82f6",icon:"📊",sub:null},
+        {label:"Gastos",value:fmt(totalGastos),color:"#ef4444",icon:"💸",sub:null},
+        {label:"Utilidad Neta",value:fmt(utilidad),color:utilidad>=0?"#22c55e":"#ef4444",icon:"💰",sub:null},
+      ].map(({label,value,color,icon,sub})=>
+        React.createElement("div",{key:label,style:{background:"#1c1c1c",border:"1px solid #252525",borderRadius:12,padding:"14px 14px 12px"}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}},
+            React.createElement("div",{style:{fontSize:9,letterSpacing:2,color:"#888",textTransform:"uppercase",fontWeight:600}},label),
+            React.createElement("div",{style:{fontSize:16}},icon)
+          ),
+          React.createElement("div",{style:{fontSize:22,fontWeight:800,color,fontFamily:"'Barlow Condensed',sans-serif",lineHeight:1.2,marginTop:6}},value),
+          sub&&React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:3}},sub)
+        )
+      )
+    ),
+
+    // ── TOP SERVICIOS ──
+    topSvc.length>0&&React.createElement("div",{style:{background:"#1c1c1c",border:"1px solid #252525",borderRadius:14,padding:"16px 16px 12px",marginBottom:14}},
+      React.createElement("div",{style:{fontSize:9,letterSpacing:3,color:"#c9a84c",textTransform:"uppercase",fontWeight:700,marginBottom:14,fontFamily:"'Barlow Condensed',sans-serif"}},"Top Servicios del Mes"),
+      topSvc.map(([name,count],i)=>{
+        const pct=Math.round((count/maxSvc)*100);
+        const colors=["#c9a84c","#3b82f6","#22c55e","#8b5cf6"];
+        const c=colors[i]||"#888";
+        return React.createElement("div",{key:name,style:{marginBottom:10}},
+          React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:4}},
+            React.createElement("div",{style:{fontSize:12,color:"#d0d0d0",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",flex:1,paddingRight:8}},name),
+            React.createElement("div",{style:{fontSize:11,color:c,fontWeight:700,flexShrink:0}},count," "+(count===1?"servicio":"servicios"))
+          ),
+          React.createElement("div",{style:{height:4,background:"#2a2a2a",borderRadius:4,overflow:"hidden"}},
+            React.createElement("div",{style:{height:"100%",width:pct+"%",background:c,borderRadius:4,transition:"width .6s ease"}})
+          )
+        );
+      })
+    ),
+
+    // ── PRÓXIMOS SERVICIOS ──
+    React.createElement("div",{style:{background:"#1c1c1c",border:"1px solid #252525",borderRadius:14,padding:"16px 16px 12px",marginBottom:14}},
+      React.createElement("div",{style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14}},
+        React.createElement("div",{style:{fontSize:9,letterSpacing:3,color:"#c9a84c",textTransform:"uppercase",fontWeight:700,fontFamily:"'Barlow Condensed',sans-serif"}},"Próximos Servicios"),
+        React.createElement("button",{onClick:()=>setTab("calendar"),style:{fontSize:10,color:"#555",background:"none",border:"none",cursor:"pointer",padding:0}},"Ver agenda →")
+      ),
+      upcoming.length===0
+        ? React.createElement("div",{style:{fontSize:12,color:"#555",textAlign:"center",padding:"12px 0"}},"No hay servicios próximos")
+        : upcoming.map((s,i)=>{
+            const stObj=SERVICE_STATUSES.find(x=>x.id===s.status);
+            const dayName=DAY_NAMES[new Date(s.year||year,( s.month||month)-1,s.day).getDay()];
+            return React.createElement("div",{key:i,style:{display:"flex",gap:12,alignItems:"center",padding:"10px 0",borderBottom:i<upcoming.length-1?"1px solid #252525":"none"}},
+              React.createElement("div",{style:{width:40,height:40,borderRadius:10,background:"rgba(201,168,76,.1)",border:"1px solid rgba(201,168,76,.2)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",flexShrink:0}},
+                React.createElement("div",{style:{fontSize:14,fontWeight:800,color:"#c9a84c",fontFamily:"'Barlow Condensed',sans-serif",lineHeight:1}},s.day),
+                React.createElement("div",{style:{fontSize:7,color:"#888",textTransform:"uppercase",letterSpacing:1}},MONTHS_SHORT[(s.month||month)-1])
+              ),
+              React.createElement("div",{style:{flex:1,minWidth:0}},
+                React.createElement("div",{style:{fontSize:12,fontWeight:600,color:"#fff",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}},s.service||"Servicio agendado"),
+                React.createElement("div",{style:{fontSize:10,color:"#555",marginTop:2}},
+                  dayName+(s.vehicle?" · "+s.vehicle:"")
+                )
+              ),
+              stObj&&React.createElement("div",{style:{fontSize:10,color:stObj.color,fontWeight:700,flexShrink:0}},stObj.emoji)
+            );
+          })
+    ),
+
+    // ── ACCIONES RÁPIDAS ──
+    React.createElement("div",{style:{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}},
+      React.createElement("button",{onClick:()=>setTab("quoter"),style:{padding:"14px",background:"rgba(201,168,76,.1)",border:"1px solid rgba(201,168,76,.3)",borderRadius:12,color:"#c9a84c",fontFamily:"'Barlow',sans-serif",fontWeight:700,fontSize:13,cursor:"pointer"}},
+        "💰 Nueva Cotización"
+      ),
+      React.createElement("button",{onClick:()=>setTab("ventas"),style:{padding:"14px",background:"rgba(59,130,246,.1)",border:"1px solid rgba(59,130,246,.3)",borderRadius:12,color:"#3b82f6",fontFamily:"'Barlow',sans-serif",fontWeight:700,fontSize:13,cursor:"pointer"}},
+        "📊 Ver Ventas"
+      )
+    )
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
 // ROOT APP
 // ══════════════════════════════════════════════════════════════════════════════
 function App(){
-  const[tab,setTab]=useState("calendar");
+  const[tab,setTab]=useState("dashboard");
   const[toast,setToast]=useState(null);
   const[cal,setCal]=useState(()=>loadCalLocal());
   const[prefillDate,setPrefillDate]=useState(null);
@@ -238,7 +411,8 @@ function App(){
 
     ),
     React.createElement("div",{className:"page",style:{paddingBottom:70}},
-      tab==="calendar" ? React.createElement(CalendarModule,{showToast,cal,setCal,goToQuoterWithDate})
+      tab==="dashboard"? React.createElement(DashboardModule,{cal,setTab})
+      :tab==="calendar" ? React.createElement(CalendarModule,{showToast,cal,setCal,goToQuoterWithDate})
       :tab==="quoter"  ? React.createElement(QuoterModule,{showToast,cal,prefillDate,onPrefillUsed:()=>setPrefillDate(null)})
       :tab==="ventas"  ? React.createElement(VentasModule,{cal})
       :React.createElement(CatalogModule,{showToast})
@@ -247,9 +421,10 @@ function App(){
     // ── BOTTOM NAV BAR ──
     React.createElement("nav",{className:"bottom-nav"},
       [
-        {id:"calendar", icon:"📅", label:"Agenda"},
-        {id:"quoter",   icon:"💰", label:"Cotizador"},
-        {id:"ventas",   icon:"📊", label:"Ventas"},
+        {id:"dashboard", icon:"⚡", label:"Dashboard"},
+        {id:"calendar",  icon:"📅", label:"Agenda"},
+        {id:"quoter",    icon:"💰", label:"Cotizador"},
+        {id:"ventas",    icon:"📊", label:"Ventas"},
       ].map(({id,icon,label})=>{
         const active=tab===id;
         return React.createElement("button",{
@@ -265,7 +440,7 @@ function App(){
       // Hamburger / settings
       React.createElement("button",{
         className:`nav-item${tab==="catalog"?" active":""}`,
-        onClick:()=>setTab(tab==="catalog"?"calendar":"catalog"),
+        onClick:()=>setTab(tab==="catalog"?"dashboard":"catalog"),
         style:{color:tab==="catalog"?"#c9a84c":"#666"}
       },
         React.createElement("div",{className:"nav-burger"},
