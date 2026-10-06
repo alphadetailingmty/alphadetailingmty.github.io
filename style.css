@@ -10,7 +10,7 @@
   --green: #22c55e;
   --red: #ef4444;
   --blue: #3b82f6;
-  --muted: #5a5a5a;
+  --muted: #888888;
   --text: #d0d0d0;
   --white: #ffffff;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -492,4 +492,277 @@ textarea.inp { resize: vertical; min-height: 58px; }
   .qpreview-inner { padding: 0 !important; max-width: 100% !important; }
   .qpreview-bar, button { display: none !important; }
   #quote-print { border-radius: 0 !important; box-shadow: none !important; }
+}
+
+/* ══════════════════════════════════════════════
+   FASE 1 — PREMIUM POLISH
+══════════════════════════════════════════════ */
+
+/* ── BRAND ACCENT LINE ── */
+.brand-accent {
+  width: 48px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 4px auto 16px;
+  border-radius: 1px;
+}
+
+/* ── BOTTOM NAV — PREMIUM ── */
+.bottom-nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: rgba(13,13,13,.97);
+  border-top: 1px solid rgba(255,255,255,.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex; align-items: stretch;
+  padding: 0;
+  z-index: 200;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.nav-item {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 3px; padding: 10px 4px 10px;
+  border: none; background: none; cursor: pointer;
+  position: relative; transition: color .18s;
+}
+.nav-item .nav-icon { font-size: 21px; line-height: 1; transition: transform .18s; }
+.nav-item .nav-label {
+  font-size: 9px; font-weight: 600; letter-spacing: .4px;
+  font-family: 'Barlow', sans-serif; text-transform: uppercase;
+  transition: color .18s;
+}
+.nav-item.active .nav-icon { transform: scale(1.1); }
+.nav-item::before {
+  content: '';
+  position: absolute; top: 0; left: 25%; right: 25%;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+  background: var(--gold);
+  transform: scaleX(0);
+  transition: transform .2s cubic-bezier(.4,0,.2,1);
+}
+.nav-item.active::before { transform: scaleX(1); }
+
+/* ── HAMBURGER ICON ── */
+.nav-burger {
+  display: flex; flex-direction: column; gap: 3.5px;
+  width: 18px; height: 18px; justify-content: center;
+  transition: transform .18s;
+}
+.nav-burger span {
+  display: block; height: 1.5px; border-radius: 1px;
+  transition: background .18s;
+}
+.nav-item.active .nav-burger { transform: scale(1.1); }
+
+/* ── STAT CARDS — GRADIENT BORDER ── */
+.stat-card-premium {
+  background: var(--card);
+  border-radius: 11px;
+  padding: 12px 8px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.stat-card-premium::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: 11px;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--border), rgba(255,255,255,.04));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* ── MODAL SHEET — enhanced ── */
+.modal-sheet-v2 {
+  background: linear-gradient(180deg, #222 0%, #1c1c1c 100%);
+  border: 1px solid rgba(255,255,255,.07);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  padding: 12px 18px calc(44px + env(safe-area-inset-bottom, 0px));
+  width: 100%; max-width: 480px; max-height: 92vh;
+  overflow-y: auto;
+  animation: slideUp .25s cubic-bezier(.4,0,.2,1);
+  box-shadow: 0 -12px 48px rgba(0,0,0,.5);
+}
+
+/* ── HANDLE PILL ── */
+.modal-handle-v2 {
+  width: 40px; height: 4px;
+  background: rgba(255,255,255,.12);
+  border-radius: 2px;
+  margin: 0 auto 18px;
+}
+
+/* ── TYPE CARD — hover glow ── */
+.type-card {
+  position: relative;
+  overflow: hidden;
+}
+.type-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 0%, rgba(255,255,255,.05) 0%, transparent 60%);
+  opacity: 0; transition: opacity .2s;
+}
+.type-card:active::after { opacity: 1; }
+
+/* ── INPUT FOCUS GLOW ── */
+.inp:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201,168,76,.12);
+}
+
+/* ── PRIMARY BUTTON GLOW ── */
+.btn-save {
+  box-shadow: 0 2px 12px rgba(201,168,76,.3);
+}
+.btn-save:active {
+  background: var(--gold-l);
+  box-shadow: 0 1px 6px rgba(201,168,76,.2);
+}
+.preview-btn {
+  box-shadow: 0 2px 16px rgba(201,168,76,.25);
+  letter-spacing: 2.5px;
+}
+.preview-btn:active { box-shadow: none; }
+.dl-btn {
+  box-shadow: 0 2px 16px rgba(201,168,76,.25);
+}
+
+/* ── DAY CELL — premium hover ── */
+.day-cell {
+  transition: transform .13s, filter .13s, box-shadow .13s;
+}
+.day-cell:active {
+  transform: scale(.94);
+  filter: brightness(1.2);
+  box-shadow: 0 4px 16px rgba(0,0,0,.4);
+}
+
+/* ── SYNC BADGE ── */
+.sync-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 14px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase;
+  transition: all .3s;
+}
+
+/* ── SERVICE TAG IN CALENDAR ── */
+.tag-svc {
+  border-radius: 4px;
+  letter-spacing: .1px;
+}
+
+/* ── QUOTE DOCUMENT — extra premium ── */
+.qdoc {
+  box-shadow: 0 24px 80px rgba(0,0,0,.7), 0 0 0 1px rgba(201,168,76,.08);
+}
+.qdoc-header {
+  background: linear-gradient(135deg, #1f1f1f, #181818);
+}
+
+/* ── SECTION LABEL ENHANCED ── */
+.sec-label {
+  display: flex; align-items: center; gap: 8px;
+}
+.sec-label::after {
+  content: '';
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+/* ── ADD SERVICE BUTTON ── */
+.add-svc-btn {
+  position: relative; overflow: hidden;
+}
+.add-svc-btn::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(201,168,76,.08), transparent);
+  opacity: 0; transition: opacity .2s;
+}
+.add-svc-btn:active::after { opacity: 1; }
+
+/* ── CARD HOVER ── */
+.pkg-card {
+  transition: border-color .2s, box-shadow .2s;
+}
+.pkg-card:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(201,168,76,.08);
+}
+
+/* ── VENTAS IMPROVEMENTS ── */
+.ventas-bar-wrap {
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--surf);
+  height: 6px;
+  margin-top: 6px;
+}
+.ventas-bar-fill {
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--gold), var(--gold-l));
+  transition: width .4s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── TOTAL BOX ── */
+.total-box {
+  background: linear-gradient(135deg, #1f1f1f, #1a1a1a);
+  box-shadow: 0 4px 24px rgba(0,0,0,.3);
+}
+
+/* ── MONTH TITLE — animated gradient ── */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.month-title {
+  background: linear-gradient(135deg, var(--gold), var(--green), var(--gold-l));
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+}
+
+/* ── TODAY BANNER ── */
+.today-banner {
+  margin: 10px auto 0;
+  max-width: 440px;
+  background: linear-gradient(135deg, rgba(201,168,76,.13), rgba(201,168,76,.04));
+  border: 1px solid rgba(201,168,76,.25);
+  border-radius: 14px;
+  padding: 11px 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color .2s, background .2s;
+  box-shadow: 0 2px 16px rgba(201,168,76,.08);
+}
+.today-banner:active {
+  border-color: rgba(201,168,76,.5);
+  background: linear-gradient(135deg, rgba(201,168,76,.18), rgba(201,168,76,.08));
+}
+
+/* ── PIN SCREEN POLISH ── */
+.pin-key {
+  transition: background .12s, transform .08s, box-shadow .12s;
+}
+.pin-key:active {
+  transform: scale(.93);
+  box-shadow: 0 2px 8px rgba(0,0,0,.4) !important;
+}
+
+/* ── EXPORT BTN ── */
+.export-btn {
+  transition: border-color .2s, color .2s, background .2s;
+}
+.export-btn:active {
+  background: rgba(201,168,76,.07);
+  border-color: rgba(201,168,76,.4);
 }

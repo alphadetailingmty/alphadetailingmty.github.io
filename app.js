@@ -208,11 +208,12 @@ function App(){
     React.createElement("header",{className:"app-header"},
       React.createElement("div",{className:"brand-name"},"ALPHA"),
       React.createElement("div",{className:"brand-sub",style:{fontSize:"12px",letterSpacing:"6px",fontWeight:700}},"D E T A I L I N G"),
+      React.createElement("div",{className:"brand-accent"}),
 
       // TODAY BANNER
       todayData?.type==="worked"&&React.createElement("div",{
+        className:"today-banner",
         onClick:()=>setTab("calendar"),
-        style:{margin:"10px auto 0",maxWidth:440,background:"linear-gradient(135deg,rgba(201,168,76,.15),rgba(201,168,76,.05))",border:"1px solid rgba(201,168,76,.3)",borderRadius:12,padding:"10px 16px",cursor:"pointer",display:"flex",alignItems:"center",gap:12}
       },
         React.createElement("span",{style:{fontSize:22}},"🚗"),
         React.createElement("div",{style:{flex:1,textAlign:"left"}},
@@ -243,15 +244,8 @@ function App(){
       :React.createElement(CatalogModule,{showToast})
     ),
 
-    // ── BOTTOM NAV BAR (Facebook style) ──
-    React.createElement("nav",{style:{
-      position:"fixed",bottom:0,left:0,right:0,
-      background:"#111",
-      borderTop:"1px solid #222",
-      display:"flex",alignItems:"center",justifyContent:"space-around",
-      padding:`10px 8px calc(env(safe-area-inset-bottom,0px) + 10px)`,
-      zIndex:200
-    }},
+    // ── BOTTOM NAV BAR ──
+    React.createElement("nav",{className:"bottom-nav"},
       [
         {id:"calendar", icon:"📅", label:"Agenda"},
         {id:"quoter",   icon:"💰", label:"Cotizador"},
@@ -260,36 +254,26 @@ function App(){
         const active=tab===id;
         return React.createElement("button",{
           key:id,
+          className:`nav-item${active?" active":""}`,
           onClick:()=>{setTab(id);if(id!=="quoter")setPrefillDate(null);},
-          style:{
-            flex:1,background:"none",border:"none",cursor:"pointer",
-            display:"flex",flexDirection:"column",alignItems:"center",gap:3,
-            padding:"4px 0",
-            color:active?"#c9a84c":"#555",
-            transition:"color .15s"
-          }
+          style:{color:active?"#c9a84c":"#666"}
         },
-          React.createElement("span",{style:{fontSize:20,lineHeight:1}},icon),
-          React.createElement("span",{style:{fontSize:9,fontWeight:active?700:500,letterSpacing:.3,fontFamily:"'Barlow',sans-serif",textTransform:"uppercase"}},label)
+          React.createElement("span",{className:"nav-icon"},icon),
+          React.createElement("span",{className:"nav-label"},label)
         );
       }),
       // Hamburger / settings
       React.createElement("button",{
+        className:`nav-item${tab==="catalog"?" active":""}`,
         onClick:()=>setTab(tab==="catalog"?"calendar":"catalog"),
-        style:{
-          flex:1,background:"none",border:"none",cursor:"pointer",
-          display:"flex",flexDirection:"column",alignItems:"center",gap:3,
-          padding:"4px 0",
-          color:tab==="catalog"?"#c9a84c":"#555",
-          transition:"color .15s"
-        }
+        style:{color:tab==="catalog"?"#c9a84c":"#666"}
       },
-        React.createElement("div",{style:{display:"flex",flexDirection:"column",gap:3.5,width:20,height:20,justifyContent:"center"}},
-          React.createElement("div",{style:{height:2,background:tab==="catalog"?"#c9a84c":"#555",borderRadius:1,transition:"background .15s"}}),
-          React.createElement("div",{style:{height:2,background:tab==="catalog"?"#c9a84c":"#555",borderRadius:1,transition:"background .15s"}}),
-          React.createElement("div",{style:{height:2,background:tab==="catalog"?"#c9a84c":"#555",borderRadius:1,transition:"background .15s"}})
+        React.createElement("div",{className:"nav-burger"},
+          React.createElement("span",{style:{background:tab==="catalog"?"#c9a84c":"#666"}}),
+          React.createElement("span",{style:{background:tab==="catalog"?"#c9a84c":"#666"}}),
+          React.createElement("span",{style:{background:tab==="catalog"?"#c9a84c":"#666"}})
         ),
-        React.createElement("span",{style:{fontSize:9,fontWeight:tab==="catalog"?700:500,letterSpacing:.3,fontFamily:"'Barlow',sans-serif",textTransform:"uppercase",color:tab==="catalog"?"#c9a84c":"#555"}},"Servicios")
+        React.createElement("span",{className:"nav-label",style:{color:tab==="catalog"?"#c9a84c":"#666"}},"Servicios")
       )
     )
   );
@@ -534,8 +518,8 @@ function CalendarModule({showToast,cal,setCal,goToQuoterWithDate}){
 
     // ── DAY MODAL ──
     modal&&React.createElement("div",{className:"modal-overlay",onClick:e=>e.target===e.currentTarget&&setModal(null)},
-      React.createElement("div",{className:"modal-sheet"},
-        React.createElement("div",{className:"modal-handle"}),
+      React.createElement("div",{className:"modal-sheet modal-sheet-v2"},
+        React.createElement("div",{className:"modal-handle modal-handle-v2"}),
         React.createElement("div",{className:"modal-title"},`${MONTHS[month-1]} ${modal}`),
         React.createElement("div",{className:"modal-sub"},DAY_NAMES[new Date(year,month-1,modal).getDay()]),
         React.createElement("div",{className:"type-grid"},
@@ -1278,7 +1262,7 @@ function VentasModule({cal}){
             React.createElement("span",{style:{fontSize:14,minWidth:22}},o.emoji),
             React.createElement("div",{style:{flex:1}},
               React.createElement("div",{style:{display:"flex",justifyContent:"space-between",marginBottom:4}},React.createElement("span",{style:{fontSize:12,color:"#d0d0d0",fontWeight:600}},o.label),React.createElement("span",{style:{fontSize:12,color:o.color,fontWeight:700}},`${count} · ${pct}%`)),
-              React.createElement("div",{style:{height:5,background:"#2a2a2a",borderRadius:3,overflow:"hidden"}},React.createElement("div",{style:{height:"100%",width:pct+"%",background:o.color,borderRadius:3}}))
+              React.createElement("div",{className:"ventas-bar-wrap"},React.createElement("div",{className:"ventas-bar-fill",style:{width:pct+"%",background:o.color}}))
             )
           );
         }),
@@ -1471,11 +1455,11 @@ function PinScreen({onUnlock}){
   return React.createElement("div",{style:{minHeight:"100vh",background:"#0e0e0e",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"calc(env(safe-area-inset-top,20px) + 20px) 16px calc(env(safe-area-inset-bottom,0px) + 40px)"}},
     React.createElement("div",{style:{fontFamily:"'Barlow Condensed',sans-serif",fontSize:"clamp(36px,10vw,56px)",fontWeight:800,letterSpacing:10,color:"#fff",lineHeight:1}},"ALPHA"),
     React.createElement("div",{style:{fontSize:12,letterSpacing:7,color:"#c9a84c",fontWeight:700,textTransform:"uppercase",marginBottom:48}},"D E T A I L I N G"),
-    React.createElement("div",{style:{fontSize:13,letterSpacing:2,color:"#606060",textTransform:"uppercase",marginBottom:24}},"Ingresa tu PIN"),
+    React.createElement("div",{style:{fontSize:13,letterSpacing:2,color:"#888",textTransform:"uppercase",marginBottom:24}},"Ingresa tu PIN"),
     React.createElement("div",{style:{display:"flex",gap:16,marginBottom:8,animation:shake?"shake .35s ease":"none"}},dots),
     React.createElement("div",{style:{fontSize:12,color:"#ef4444",height:18,marginBottom:24,letterSpacing:1}},hint),
     React.createElement("div",{style:{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,width:"100%",maxWidth:280}},
-      keys.flat().map((k,i)=>{if(k==="")return React.createElement("div",{key:i});return React.createElement("button",{key:i,onClick:()=>k==="⌫"?handleDel():handleDigit(k),style:{padding:"18px 0",borderRadius:14,background:k==="⌫"?"transparent":"#1c1c1c",border:k==="⌫"?"none":"1px solid #2a2a2a",color:k==="⌫"?"#606060":"#fff",fontFamily:"'Barlow Condensed',sans-serif",fontSize:k==="⌫"?22:26,fontWeight:700,cursor:"pointer",WebkitTapHighlightColor:"transparent"}},k);})
+      keys.flat().map((k,i)=>{if(k==="")return React.createElement("div",{key:i});return React.createElement("button",{key:i,className:"pin-key",onClick:()=>k==="⌫"?handleDel():handleDigit(k),style:{padding:"18px 0",borderRadius:14,background:k==="⌫"?"transparent":"#1c1c1c",border:k==="⌫"?"none":"1px solid #2a2a2a",color:k==="⌫"?"#888":"#fff",fontFamily:"'Barlow Condensed',sans-serif",fontSize:k==="⌫"?22:26,fontWeight:700,cursor:"pointer",WebkitTapHighlightColor:"transparent"}},k);})
     )
   );
 }
