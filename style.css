@@ -727,6 +727,9 @@ textarea.inp { resize: vertical; min-height: 58px; }
   background: linear-gradient(135deg, var(--gold), var(--green), var(--gold-l));
   background-size: 200% 200%;
   animation: gradientShift 6s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ── TODAY BANNER ── */
